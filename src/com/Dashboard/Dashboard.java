@@ -976,8 +976,8 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel8.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel7.setText("Nuevos Productos");
-        jPanel8.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 10, 160, -1));
+        jLabel7.setText("Total  Productos");
+        jPanel8.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 160, -1));
 
         JNuevoProductos.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         JNuevoProductos.setText("0 Productos");

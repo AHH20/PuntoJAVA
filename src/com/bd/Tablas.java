@@ -180,6 +180,13 @@ public class Tablas {
            sms.execute(insertNuevaCategoria);
            System.out.println("Nuevas Categorias insertadas");
            
+           String insertNuevaCategorias = "INSERT INTO Categorias(nombreCategoria) "
+                  + "SELECT 'Bedidas' "
+                  + "WHERE NOT EXISTS(SELECT 1 FROM Categorias WHERE nombreCategoria = 'Bebidas')";
+           
+           sms.execute(insertNuevaCategorias);
+           System.out.println("Nuevas Categorias insertadas");
+           
            // Optimizar base de datos
            sms.execute("ANALYZE");
            System.out.println("Base de datos optimizada");
