@@ -10,6 +10,7 @@ public class Conexion {
     private static String rutaBD = null;
     private static Connection conexionActiva = null; // ✅ Mantener referencia
     
+
     /**
      * Obtener ruta de la base de datos
      */
@@ -142,4 +143,8 @@ public class Conexion {
             return false;
         }
     }
+    
+   
+    
+    
 }
