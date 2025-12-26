@@ -76,6 +76,7 @@ public class Inventario extends javax.swing.JFrame {
        iniciarActualizacionAutomatica();
        configurarBusqueda();
        configurarBotonDescargar();
+       configurarOrdenamiento();
        
   
     }
@@ -504,6 +505,94 @@ private void navegarAValorInventario() {
         Icon miIcono = new ImageIcon(new ImageIcon(getClass().getResource(ruta)).getImage().getScaledInstance(width, height,0));
         return miIcono;
         }
+    
+    
+    private void configurarOrdenamiento() {
+    javax.swing.table.TableRowSorter<DefaultTableModel> sorter = 
+        new javax.swing.table.TableRowSorter<>((DefaultTableModel) JTableReporte.getModel());
+    
+    JTableReporte.setRowSorter(sorter);
+    
+    // Comparador para Stock Actual (columna 1)
+    sorter.setComparator(1, new java.util.Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            try {
+                int num1 = Integer.parseInt(o1.replaceAll("[^0-9]", ""));
+                int num2 = Integer.parseInt(o2.replaceAll("[^0-9]", ""));
+                return Integer.compare(num1, num2);
+            } catch (NumberFormatException e) {
+                return o1.compareTo(o2);
+            }
+        }
+    });
+    
+    // Comparador para Unidades Vendidas (columna 2)
+    sorter.setComparator(2, new java.util.Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            try {
+                int num1 = Integer.parseInt(o1.replaceAll("[^0-9]", ""));
+                int num2 = Integer.parseInt(o2.replaceAll("[^0-9]", ""));
+                return Integer.compare(num1, num2);
+            } catch (NumberFormatException e) {
+                return o1.compareTo(o2);
+            }
+        }
+    });
+    
+    // Comparador para Valor Total (columna 3)
+    sorter.setComparator(3, new java.util.Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            try {
+                // Remover $, comas y espacios, dejar solo números y punto decimal
+                String clean1 = o1.replaceAll("[$,\\s]", "");
+                String clean2 = o2.replaceAll("[$,\\s]", "");
+                double num1 = Double.parseDouble(clean1);
+                double num2 = Double.parseDouble(clean2);
+                return Double.compare(num1, num2);
+            } catch (NumberFormatException e) {
+                return o1.compareTo(o2);
+            }
+        }
+    });
+    
+    // Comparador para Precio Venta (columna 4)
+    sorter.setComparator(4, new java.util.Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            try {
+                // Remover $, comas y espacios, dejar solo números y punto decimal
+                String clean1 = o1.replaceAll("[$,\\s]", "");
+                String clean2 = o2.replaceAll("[$,\\s]", "");
+                double num1 = Double.parseDouble(clean1);
+                double num2 = Double.parseDouble(clean2);
+                return Double.compare(num1, num2);
+            } catch (NumberFormatException e) {
+                return o1.compareTo(o2);
+            }
+        }
+    });
+    
+    // Comparador para Nivel de Rotación (columna 5)
+    sorter.setComparator(5, new java.util.Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            java.util.Map<String, Integer> orden = new java.util.HashMap<>();
+            orden.put("⚠️ Sin Stock", 0);
+            orden.put("️Muy Lenta", 1);
+            orden.put("Lenta", 2);
+            orden.put("Media", 3);
+            orden.put("Rápida ", 4);
+            
+            int valor1 = orden.getOrDefault(o1.trim(), 0);
+            int valor2 = orden.getOrDefault(o2.trim(), 0);
+            
+            return Integer.compare(valor1, valor2);
+        }
+    });
+}
     
     
     

@@ -28,11 +28,13 @@ import static com.Productos.GestionProductos.lbl_ini2;
 import static com.Productos.GestionProductos.lbl_ini3;
 import static com.Productos.GestionProductos.lbl_ini4;
 import com.bd.Conexion;
+import com.respaldo.Respaldo;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.io.File;
 import java.math.BigDecimal;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -79,6 +81,7 @@ public class Dashboard extends javax.swing.JFrame {
        actualizarStockBajo();
        actualizarNuevosProductos();
        actualizarGananciasDelDia();
+       verificarRespaldoPeriodico();
        
       
       
@@ -438,7 +441,7 @@ public class Dashboard extends javax.swing.JFrame {
    private void actualizarStockBajo(){
         String sql = "SELECT COUNT(*) as cantidad " +
                  "FROM Productos " +
-                 "WHERE cantidad < 10 AND cantidad > 0";
+                 "WHERE cantidad < 10 AND cantidad >= 0";
         
         
         try(Connection db = Conexion.conectar();
@@ -447,7 +450,7 @@ public class Dashboard extends javax.swing.JFrame {
             
             if (rs.next()) {
             int cantidad = rs.getInt("cantidad");
-            if (cantidad > 0) {
+            if (cantidad  >= 0) {
                 JStockBajo.setText(cantidad + " Productos");
                 JStockBajo.setForeground(new Color(231, 76, 60)); 
             } else {
@@ -552,63 +555,162 @@ public class Dashboard extends javax.swing.JFrame {
     };
     
   
-    public void iniciarMenu(){
+    public void iniciarMenu() {
+        // Crear menú sin íconos para evitar errores
+        JMenuItem Respaldo = new JMenuItem("Respaldo", getIcon("/com/Imagenes/copia.png",25,25));
+        JMenuItem Cerrar = new JMenuItem("Cerrar", getIcon("/com/Imagenes/cerrar-sesion.png",25,25));
+     
         
-        JMenuItem Ajustes = new JMenuItem("Ajustes", getIcon("/com/Imagenes/ajuste.png",25,25));
-        JMenuItem Cerrar = new JMenuItem("Cerrar Sesion", getIcon("/com/Imagenes/cerrar-sesion.png",25,25));
-        
-        
-        MenuUsuario.add(Ajustes);
+        MenuUsuario.add(Respaldo);
         MenuUsuario.addSeparator();
         MenuUsuario.add(Cerrar);
         
         Saludo.setComponentPopupMenu(MenuUsuario);
         
-        Ajustes.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR) {
-        });
+        Respaldo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         
-        Cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR){
-        });
-        
-        
-        Ajustes.addActionListener(new ActionListener() {
+        // ACCIÓN PARA RESPALDO
+        Respaldo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-              
-                Ajustes configuracion = new Ajustes();
-                
-                configuracion.setVisible(true);
-                Dashboard.this.dispose();
-                
-     
+                com.respaldo.Respaldo.mostrarMenuRespaldo();
             }
         });
         
-        Cerrar.addActionListener(new ActionListener(){
-               @Override
-              public void actionPerformed(ActionEvent e){
-              
-                  Login inicio = new Login();
-                  
-                  inicio.setVisible(true);
-                  
-                  Dashboard.this.dispose();
-                  
-              }
-        
+        Cerrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Preguntar si desea hacer respaldo antes de cerrar
+                int opcion = JOptionPane.showConfirmDialog(null,
+                        "¿Desea crear un respaldo antes de cerrar sesión?",
+                        "Respaldo de Seguridad",
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                
+                if (opcion == JOptionPane.CANCEL_OPTION) {
+                    return; // No cerrar sesión
+                }
+                
+                if (opcion == JOptionPane.YES_OPTION) {
+                    com.respaldo.Respaldo.crearRespaldo();
+                }
+                
+                // Cerrar sesión
+                Login inicio = new Login();
+                inicio.setVisible(true);
+                Dashboard.this.dispose();
+            }
         });
-        
     }
     
-    
-    
-    //
-        public Icon getIcon( String ruta, int width, int height){
-
-        Icon miIcono = new ImageIcon(new ImageIcon(getClass().getResource(ruta)).getImage().getScaledInstance(width, height,0));
-        return miIcono;
+    /**
+     * Método mejorado para cargar íconos con manejo de errores
+     */
+    public Icon getIcon(String ruta, int width, int height) {
+        try {
+            java.net.URL imgURL = getClass().getResource(ruta);
+            if (imgURL != null) {
+                ImageIcon icono = new ImageIcon(imgURL);
+                Image img = icono.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                return new ImageIcon(img);
+            } else {
+                System.err.println("No se encontró la imagen: " + ruta);
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("Error al cargar imagen " + ruta + ": " + e.getMessage());
+            return null;
         }
+    }
     
+    private void verificarRespaldoPeriodico() {
+        try {
+            String dirBD = Conexion.getDirectorioBD();
+            if (dirBD == null) {
+                logger.warning("No se pudo obtener el directorio de la BD");
+                return;
+            }
+            
+            File carpeta = new File(dirBD + File.separator + "Respaldos");
+            
+            if (!carpeta.exists()) {
+                carpeta.mkdirs();
+                
+                int crear = JOptionPane.showConfirmDialog(null,
+                        "🔐 Sistema de Respaldo\n\n" +
+                        "No se han encontrado respaldos previos.\n" +
+                        "¿Desea crear su primer respaldo ahora?\n\n" +
+                        "Esto protegerá toda su información.",
+                        "Crear Primer Respaldo",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE);
+                
+                if (crear == JOptionPane.YES_OPTION) {
+                    Respaldo.crearRespaldo();
+                }
+                return;
+            }
+            
+            File[] archivos = carpeta.listFiles((dir, name)
+                    -> name.startsWith("respaldo_") && (name.endsWith(".db") || name.endsWith(".zip")));
+            
+            if (archivos == null || archivos.length == 0) {
+                // No hay respaldos
+                int crear = JOptionPane.showConfirmDialog(null,
+                        "⚠️ No se han encontrado respaldos.\n\n" +
+                        "Es muy importante hacer respaldos periódicos\n" +
+                        "para proteger su información.\n\n" +
+                        "¿Desea crear uno ahora?",
+                        "Crear Respaldo",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                
+                if (crear == JOptionPane.YES_OPTION) {
+                    Respaldo.crearRespaldo();
+                }
+                return;
+            }
+            
+            // Buscar el respaldo más reciente
+            long ultimoRespaldo = 0;
+            for (File archivo : archivos) {
+                if (archivo.lastModified() > ultimoRespaldo) {
+                    ultimoRespaldo = archivo.lastModified();
+                }
+            }
+            
+            // Calcular días desde el último respaldo
+            long diasDesdeUltimo = (System.currentTimeMillis() - ultimoRespaldo)
+                    / (1000 * 60 * 60 * 24);
+            
+            // Recordatorio si han pasado 7 días o más
+            if (diasDesdeUltimo >= 7) {
+                int crear = JOptionPane.showConfirmDialog(null,
+                        "⚠️ RECORDATORIO DE RESPALDO ⚠️\n\n" +
+                        "Han pasado " + diasDesdeUltimo + " días desde el último respaldo.\n\n" +
+                        "Se recomienda crear un respaldo periódicamente\n" +
+                        "para proteger su información.\n\n" +
+                        "¿Desea crear un respaldo ahora?",
+                        "Recordatorio de Respaldo",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                
+                if (crear == JOptionPane.YES_OPTION) {
+                    Respaldo.crearRespaldo();
+                }
+            }
+            
+        } catch (Exception e) {
+            // Ignorar errores silenciosamente para no interrumpir el inicio
+            logger.log(java.util.logging.Level.WARNING, "Error al verificar respaldos", e);
+        }
+    }
+    
+    // OPCIONAL: Agregar método para respaldo rápido desde Dashboard
+    public void hacerRespaldoRapido() {
+        Respaldo.crearRespaldo();
+    }
     
     
 
@@ -1032,9 +1134,10 @@ public class Dashboard extends javax.swing.JFrame {
          this.setVisible(false);
     }//GEN-LAST:event_Menu4MousePressed
 
-    /**
-     * @param args the command line arguments
-     */
+ 
+    
+    
+     
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

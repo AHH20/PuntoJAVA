@@ -514,38 +514,19 @@ public class Ventas extends javax.swing.JFrame {
     
     public void iniciarMenu(){
         
-        JMenuItem Ajustes = new JMenuItem("Ajustes", getIcon("/com/Imagenes/ajuste.png",25,25));
+      
         JMenuItem Cerrar = new JMenuItem("Cerrar Sesion", getIcon("/com/Imagenes/cerrar-sesion.png",25,25));
         
          
-        MenuUsuario.add(Ajustes);
-        MenuUsuario.addSeparator();
         MenuUsuario.add(Cerrar);
         
         Saludo.setComponentPopupMenu(MenuUsuario);
         
-        Ajustes.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR) {
-        });
+      
         
         Cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR){
         });
         
-        
-        Ajustes.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-              
-                Ajustes configuracion = new Ajustes();
-                
-                configuracion.setVisible(true);
-                
-                Ventas.this.dispose();
-                
-              
-                
-     
-            }
-        });
         
         Cerrar.addActionListener(new ActionListener(){
                @Override

@@ -164,44 +164,235 @@ public class Register extends javax.swing.JFrame {
 
     private void ButtonCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonCreateActionPerformed
         // TODO add your handling code here:
+        String Usuario = TxtUsuario.getText().trim();
+    String Correo = TxtCorreo.getText().trim();
+    String Password = new String(TxtPassword.getPassword()).trim();
+    
+    // Validación 1: Campos vacíos específicos
+    if(Usuario.isEmpty() && Correo.isEmpty() && Password.isEmpty()){
+        JOptionPane.showMessageDialog(null,
+            "Por favor, complete todos los campos para crear su cuenta",
+            "Campos vacíos",
+            JOptionPane.WARNING_MESSAGE);
+        TxtUsuario.requestFocus();
+        return;
+    }
+    
+    if(Usuario.isEmpty()){
+        JOptionPane.showMessageDialog(null,
+            "Por favor, ingrese un nombre de usuario",
+            "Usuario requerido",
+            JOptionPane.WARNING_MESSAGE);
+        TxtUsuario.requestFocus();
+        return;
+    }
+    
+    if(Correo.isEmpty()){
+        JOptionPane.showMessageDialog(null,
+            "Por favor, ingrese su correo electrónico",
+            "Correo requerido",
+            JOptionPane.WARNING_MESSAGE);
+        TxtCorreo.requestFocus();
+        return;
+    }
+    
+    if(Password.isEmpty()){
+        JOptionPane.showMessageDialog(null,
+            "Por favor, ingrese una contraseña",
+            "Contraseña requerida",
+            JOptionPane.WARNING_MESSAGE);
+        TxtPassword.requestFocus();
+        return;
+    }
+    
+    // Validación 2: Longitud del usuario
+    if(Usuario.length() < 3){
+        JOptionPane.showMessageDialog(null,
+            "El nombre de usuario debe tener al menos 3 caracteres",
+            "Usuario muy corto",
+            JOptionPane.ERROR_MESSAGE);
+        TxtUsuario.requestFocus();
+        TxtUsuario.selectAll();
+        return;
+    }
+    
+    if(Usuario.length() > 50){
+        JOptionPane.showMessageDialog(null,
+            "El nombre de usuario no puede exceder 50 caracteres",
+            "Usuario muy largo",
+            JOptionPane.ERROR_MESSAGE);
+        TxtUsuario.requestFocus();
+        TxtUsuario.selectAll();
+        return;
+    }
+    
+    // Validación 3: Caracteres válidos en usuario
+    if(!Usuario.matches("^[a-zA-Z0-9_.-]+$")){
+        JOptionPane.showMessageDialog(null,
+            "El usuario solo puede contener letras, números, guiones y puntos",
+            "Caracteres no válidos",
+            JOptionPane.ERROR_MESSAGE);
+        TxtUsuario.requestFocus();
+        TxtUsuario.selectAll();
+        return;
+    }
+    
+    // Validación 4: Formato de correo
+    if(!ValidarCorreo(Correo)){
+        JOptionPane.showMessageDialog(null,
+            "El formato del correo electrónico no es válido.\nEjemplo: usuario@dominio.com",
+            "Correo inválido",
+            JOptionPane.ERROR_MESSAGE);
+        TxtCorreo.requestFocus();
+        TxtCorreo.selectAll();
+        return;
+    }
+    
+    // Validación 5: Longitud y seguridad de contraseña
+    if(Password.length() < 6){
+        JOptionPane.showMessageDialog(null,
+            "La contraseña debe tener al menos 6 caracteres",
+            "Contraseña muy corta",
+            JOptionPane.ERROR_MESSAGE);
+        TxtPassword.requestFocus();
+        TxtPassword.selectAll();
+        return;
+    }
+    
+    if(Password.length() > 100){
+        JOptionPane.showMessageDialog(null,
+            "La contraseña no puede exceder 100 caracteres",
+            "Contraseña muy larga",
+            JOptionPane.ERROR_MESSAGE);
+        TxtPassword.requestFocus();
+        return;
+    }
+    
+    // Validación 6: Verificar seguridad básica de contraseña
+    if(Password.equals(Usuario) || Password.equals(Correo)){
+        JOptionPane.showMessageDialog(null,
+            "La contraseña no puede ser igual al usuario o correo",
+            "Contraseña insegura",
+            JOptionPane.ERROR_MESSAGE);
+        TxtPassword.setText("");
+        TxtPassword.requestFocus();
+        return;
+    }
+    
+    // Validación 7: Contraseña debe tener al menos una letra y un número
+    boolean tieneLetra = Password.matches(".*[a-zA-Z].*");
+    boolean tieneNumero = Password.matches(".*[0-9].*");
+    
+    if(!tieneLetra || !tieneNumero){
+        JOptionPane.showMessageDialog(null,
+            "La contraseña debe contener al menos:\n• Una letra\n• Un número",
+            "Contraseña débil",
+            JOptionPane.WARNING_MESSAGE);
+        TxtPassword.requestFocus();
+        return;
+    }
+    
+    // Proceso de registro
+    try(Connection db = Conexion.conectar()){
         
-        String Usuario = TxtUsuario.getText();
-        String Correo = TxtCorreo.getText();
-        String Password = TxtPassword.getText();
-        
-        
-        
-        
-        if(Usuario.isEmpty()|| Correo.isEmpty() || Password.isEmpty()){
-        
-            JOptionPane.showMessageDialog(null, "Completa todo los campos");
-        }else if(Usuario.length()<3){
-        JOptionPane.showMessageDialog(null,"El usuario debe tener mas de 3 caracteres");
-       
-        }else if(!ValidarCorreo(Correo)){
-        JOptionPane.showMessageDialog(null,"Debes Ingresar un correo valido");
-        }else if(Password.length()<6){
-        JOptionPane.showMessageDialog(null,"La contraseña debe tener mas de 6 caracteres");
-        }else{
-         
-            try(Connection db = Conexion.conectar()){
-                String Consulta = "INSERT INTO Usuarios(Usuario,Correo,Contrasena)VALUES(?,?,?)";
-                
-                PreparedStatement ps = db.prepareStatement(Consulta);
-                
-                ps.setString(1,Usuario);
-                ps.setString(2, Correo);
-                ps.setString(3,Password);
-                ps.executeUpdate();
-                
-                Limpiar();
-                JOptionPane.showMessageDialog(null,"Usuario Registrado Correctamente");
-            }catch(Exception e){
-            JOptionPane.showMessageDialog(null,"No Se aguardo"+ e);
-            e.printStackTrace();
-            }
-        
+        if(db == null){
+            JOptionPane.showMessageDialog(null,
+                "No se pudo conectar a la base de datos.\nVerifique su conexión.",
+                "Error de conexión",
+                JOptionPane.ERROR_MESSAGE);
+            return;
         }
+        
+        // Verificar si el usuario ya existe
+        String verificarUsuario = "SELECT id FROM Usuarios WHERE Usuario = ?";
+        PreparedStatement psVerifUsuario = db.prepareStatement(verificarUsuario);
+        psVerifUsuario.setString(1, Usuario);
+        
+        if(psVerifUsuario.executeQuery().next()){
+            JOptionPane.showMessageDialog(null,
+                "Este nombre de usuario ya está en uso.\nPor favor, elija otro.",
+                "Usuario no disponible",
+                JOptionPane.WARNING_MESSAGE);
+            TxtUsuario.requestFocus();
+            TxtUsuario.selectAll();
+            psVerifUsuario.close();
+            return;
+        }
+        psVerifUsuario.close();
+        
+        // Verificar si el correo ya existe
+        String verificarCorreo = "SELECT id FROM Usuarios WHERE Correo = ?";
+        PreparedStatement psVerifCorreo = db.prepareStatement(verificarCorreo);
+        psVerifCorreo.setString(1, Correo);
+        
+        if(psVerifCorreo.executeQuery().next()){
+            JOptionPane.showMessageDialog(null,
+                "Este correo electrónico ya está registrado.\n¿Desea iniciar sesión?",
+                "Correo ya registrado",
+                JOptionPane.WARNING_MESSAGE);
+            TxtCorreo.requestFocus();
+            TxtCorreo.selectAll();
+            psVerifCorreo.close();
+            return;
+        }
+        psVerifCorreo.close();
+        
+    
+        String Consulta = "INSERT INTO Usuarios(Usuario, Correo, Contrasena) VALUES(?, ?, ?)";
+        PreparedStatement ps = db.prepareStatement(Consulta);
+        
+        ps.setString(1, Usuario);
+        ps.setString(2, Correo);
+        ps.setString(3, Password);
+        
+        int filasAfectadas = ps.executeUpdate();
+        ps.close();
+        
+        if(filasAfectadas > 0){
+            Limpiar();
+            
+            int opcion = JOptionPane.showConfirmDialog(null,
+                "¡Cuenta creada exitosamente!\n\n" +
+                "Usuario: " + Usuario + "\n" +
+                "Correo: " + Correo + "\n\n" +
+                "¿Desea iniciar sesión ahora?",
+                "Registro exitoso",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.INFORMATION_MESSAGE);
+            
+            if(opcion == JOptionPane.YES_OPTION){
+                Login IniciarSesion = new Login();
+                IniciarSesion.setVisible(true);
+                this.dispose();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null,
+                "No se pudo crear la cuenta.\nIntente nuevamente.",
+                "Error en registro",
+                JOptionPane.ERROR_MESSAGE);
+        }
+        
+    } catch(java.sql.SQLIntegrityConstraintViolationException e){
+        JOptionPane.showMessageDialog(null,
+            "El usuario o correo ya están registrados en el sistema",
+            "Datos duplicados",
+            JOptionPane.ERROR_MESSAGE);
+        logger.log(java.util.logging.Level.WARNING, "Intento de registro duplicado", e);
+        
+    } catch(java.sql.SQLException e){
+        JOptionPane.showMessageDialog(null,
+            "Error en la base de datos: " + e.getMessage(),
+            "Error SQL",
+            JOptionPane.ERROR_MESSAGE);
+        logger.log(java.util.logging.Level.SEVERE, "Error SQL en registro", e);
+        
+    } catch(Exception e){
+        JOptionPane.showMessageDialog(null,
+            "Error inesperado al crear la cuenta.\nPor favor, intente nuevamente.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        logger.log(java.util.logging.Level.SEVERE, "Error en registro", e);
+    }
   
   
     }//GEN-LAST:event_ButtonCreateActionPerformed

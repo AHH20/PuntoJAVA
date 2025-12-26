@@ -90,40 +90,29 @@ public class GestionProductos extends javax.swing.JFrame {
     
     
     
+    
+    
+    
+    
+    
+    
     public void iniciarMenu(){
         
-        JMenuItem Ajustes = new JMenuItem("Ajustes", getIcon("/com/Imagenes/ajuste.png",25,25));
+
         JMenuItem Cerrar = new JMenuItem("Cerrar Sesion", getIcon("/com/Imagenes/cerrar-sesion.png",25,25));
         
          
-        MenuUsuario.add(Ajustes);
-        MenuUsuario.addSeparator();
         MenuUsuario.add(Cerrar);
         
         Saludo.setComponentPopupMenu(MenuUsuario);
         
-        Ajustes.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR) {
-        });
+      
         
         Cerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR){
         });
         
         
-        Ajustes.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-              
-                Ajustes configuracion = new Ajustes();
-                
-                configuracion.setVisible(true);
-                
-                GestionProductos.this.dispose();
-                
-              
-                
-     
-            }
-        });
+        
         
         Cerrar.addActionListener(new ActionListener(){
                @Override
@@ -375,6 +364,10 @@ public class GestionProductos extends javax.swing.JFrame {
 
             }
         ));
+        tablaMuestraProducto.setFocusable(false);
+        tablaMuestraProducto.setSelectionBackground(new java.awt.Color(51, 153, 255));
+        tablaMuestraProducto.setSelectionForeground(new java.awt.Color(255, 255, 255));
+        tablaMuestraProducto.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(tablaMuestraProducto);
 
         jPanel5.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 950, 580));

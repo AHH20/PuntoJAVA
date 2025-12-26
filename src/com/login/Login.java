@@ -155,11 +155,11 @@ public class Login extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1101, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 715, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 666, Short.MAX_VALUE)
         );
 
         pack();
@@ -196,56 +196,135 @@ public class Login extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         
-        String Usuario = TxtCorreo.getText().trim();
-        String Contrasena = new String(TxtPassword.getPassword());
+          String Usuario = TxtCorreo.getText().trim();
+    String Contrasena = new String(TxtPassword.getPassword());
+    
+   
+    if(Usuario.isEmpty() && Contrasena.isEmpty()){
+        JOptionPane.showMessageDialog(null, 
+            "Por favor, ingrese su correo y contraseña", 
+            "Campos vacíos", 
+            JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    if(Usuario.isEmpty()){
+        JOptionPane.showMessageDialog(null, 
+            "Por favor, ingrese su correo electrónico", 
+            "Correo requerido", 
+            JOptionPane.WARNING_MESSAGE);
+        TxtCorreo.requestFocus();
+        return;
+    }
+    
+    if(Contrasena.isEmpty()){
+        JOptionPane.showMessageDialog(null, 
+            "Por favor, ingrese su contraseña", 
+            "Contraseña requerida", 
+            JOptionPane.WARNING_MESSAGE);
+        TxtPassword.requestFocus();
+        return;
+    }
+    
+    
+    if(!ValidarCorreo(Usuario)){
+        JOptionPane.showMessageDialog(null,
+            "El formato del correo electrónico no es válido.\nEjemplo: usuario@dominio.com",
+            "Correo inválido",
+            JOptionPane.ERROR_MESSAGE);
+        TxtCorreo.requestFocus();
+        TxtCorreo.selectAll();
+        return;
+    }
+    
+
+    if(Contrasena.length() < 6){
+        JOptionPane.showMessageDialog(null,
+            "La contraseña debe tener al menos 6 caracteres",
+            "Contraseña muy corta",
+            JOptionPane.ERROR_MESSAGE);
+        TxtPassword.requestFocus();
+        TxtPassword.selectAll();
+        return;
+    }
+    
+  
+    try(Connection db = Conexion.conectar()){
         
-        if(Usuario.isEmpty() || Contrasena.isEmpty()){
-            JOptionPane.showMessageDialog(null, "Debe Completar los campos");
-            }else if(!ValidarCorreo(Usuario)){
-                
-            JOptionPane.showMessageDialog(null,"Debe poner un correo valido");
+        if(db == null){
+            JOptionPane.showMessageDialog(null,
+                "No se pudo conectar a la base de datos.\nVerifique su conexión.",
+                "Error de conexión",
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String Auth = "SELECT id, Usuario, Correo FROM Usuarios WHERE Correo = ? AND Contrasena = ?";
+        
+        PreparedStatement ps = db.prepareStatement(Auth);
+        ps.setString(1, Usuario);
+        ps.setString(2, Contrasena);
+        
+        ResultSet rs = ps.executeQuery();
+        
+        if(rs.next()){
+            // Login exitoso
+            SesionUsuario.id = rs.getInt("id");
+            SesionUsuario.NombreUsuario = rs.getString("Usuario");
+            SesionUsuario.Correo = rs.getString("Correo");
             
-            }else{
-                    
-                    try(Connection db = Conexion.conectar()){
-                        
-                        String Auth = "SELECT id, Usuario, Correo FROM Usuarios WHERE Correo = ? AND Contrasena = ?";
-                        
-                        PreparedStatement ps = db.prepareStatement(Auth);
-                        
-                        ps.setString(1, Usuario);
-                        ps.setString(2,Contrasena);
-                        ResultSet rs = ps.executeQuery();
-                        
-                        if(rs.next()){
-                            
-                         SesionUsuario.id = rs.getInt("id");
-                         
-                         SesionUsuario.NombreUsuario = rs.getString("Usuario");
- 
-                         SesionUsuario.Correo = rs.getString("Correo");
-                         
-                            
-                            Dashboard Inicio = new Dashboard();
-                            
-                            Inicio.setVisible(true);
-                            
-                            this.dispose();
-                            
-                            rs.close();
-                            ps.close();
-                            db.close();
-                        }else{
-                        JOptionPane.showMessageDialog(null,"Datos incorrectos intente de nuevo");
-                        }
-                    
-                    }catch( Exception e){
-                    
-                    JOptionPane.showMessageDialog(null,"Error al iniciar sesion"+ e);
-                    e.printStackTrace();
-                    }
-                
-                }
+            JOptionPane.showMessageDialog(null,
+                "¡Bienvenido " + SesionUsuario.NombreUsuario + "!",
+                "Inicio de sesión exitoso",
+                JOptionPane.INFORMATION_MESSAGE);
+            
+            Dashboard Inicio = new Dashboard();
+            Inicio.setVisible(true);
+            this.dispose();
+            
+            rs.close();
+            ps.close();
+        } else {
+          
+            String verificarCorreo = "SELECT id FROM Usuarios WHERE Correo = ?";
+            PreparedStatement psVerificar = db.prepareStatement(verificarCorreo);
+            psVerificar.setString(1, Usuario);
+            ResultSet rsVerificar = psVerificar.executeQuery();
+            
+            if(rsVerificar.next()){
+        
+                JOptionPane.showMessageDialog(null,
+                    "Contraseña incorrecta.\nPor favor, intente nuevamente.",
+                    "Error de autenticación",
+                    JOptionPane.ERROR_MESSAGE);
+                TxtPassword.setText("");
+                TxtPassword.requestFocus();
+            } else {
+          
+                JOptionPane.showMessageDialog(null,
+                    "No existe una cuenta con este correo electrónico.\n¿Desea crear una cuenta nueva?",
+                    "Correo no registrado",
+                    JOptionPane.ERROR_MESSAGE);
+                TxtPassword.setText("");
+            }
+            
+            rsVerificar.close();
+            psVerificar.close();
+        }
+        
+    } catch(SQLException e){
+        JOptionPane.showMessageDialog(null,
+            "Error en la base de datos: " + e.getMessage(),
+            "Error SQL",
+            JOptionPane.ERROR_MESSAGE);
+        logger.log(java.util.logging.Level.SEVERE, "Error SQL en login", e);
+    } catch(Exception e){
+        JOptionPane.showMessageDialog(null,
+            "Error inesperado al iniciar sesión.\nPor favor, intente nuevamente.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        logger.log(java.util.logging.Level.SEVERE, "Error en login", e);
+    }
                              
     }//GEN-LAST:event_jButton3ActionPerformed
 

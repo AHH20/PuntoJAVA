@@ -65,6 +65,7 @@ public class ValordeInventario extends javax.swing.JFrame {
         iniciarActualizacionAutomatica();
         configurarBusqueda();
         configurarBotonDescargar();
+        configurarOrdenamiento();
        
     }
     
@@ -466,6 +467,76 @@ public void TamanoImagen(){
         Icon miIcono = new ImageIcon(new ImageIcon(getClass().getResource(ruta)).getImage().getScaledInstance(width, height,0));
         return miIcono;
         }
+    
+    
+    private void configurarOrdenamiento() {
+    javax.swing.table.TableRowSorter<DefaultTableModel> sorter = 
+        new javax.swing.table.TableRowSorter<>((DefaultTableModel) JTableValor.getModel());
+    
+    JTableValor.setRowSorter(sorter);
+    
+    // Comparador para Stock Actual (columna 1)
+    sorter.setComparator(1, new java.util.Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            try {
+                int num1 = Integer.parseInt(o1.replaceAll("[^0-9]", ""));
+                int num2 = Integer.parseInt(o2.replaceAll("[^0-9]", ""));
+                return Integer.compare(num1, num2);
+            } catch (NumberFormatException e) {
+                return o1.compareTo(o2);
+            }
+        }
+    });
+    
+    // Comparador para Valor Total (columna 2)
+    sorter.setComparator(2, new java.util.Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            try {
+                String clean1 = o1.replaceAll("[$,\\s]", "");
+                String clean2 = o2.replaceAll("[$,\\s]", "");
+                double num1 = Double.parseDouble(clean1);
+                double num2 = Double.parseDouble(clean2);
+                return Double.compare(num1, num2);
+            } catch (NumberFormatException e) {
+                return o1.compareTo(o2);
+            }
+        }
+    });
+    
+    // Comparador para Costo Total (columna 3)
+    sorter.setComparator(3, new java.util.Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            try {
+                String clean1 = o1.replaceAll("[$,\\s]", "");
+                String clean2 = o2.replaceAll("[$,\\s]", "");
+                double num1 = Double.parseDouble(clean1);
+                double num2 = Double.parseDouble(clean2);
+                return Double.compare(num1, num2);
+            } catch (NumberFormatException e) {
+                return o1.compareTo(o2);
+            }
+        }
+    });
+    
+    // Comparador para Ganancia Total (columna 4)
+    sorter.setComparator(4, new java.util.Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            try {
+                String clean1 = o1.replaceAll("[$,\\s]", "");
+                String clean2 = o2.replaceAll("[$,\\s]", "");
+                double num1 = Double.parseDouble(clean1);
+                double num2 = Double.parseDouble(clean2);
+                return Double.compare(num1, num2);
+            } catch (NumberFormatException e) {
+                return o1.compareTo(o2);
+            }
+        }
+    });
+}
     
     
  
