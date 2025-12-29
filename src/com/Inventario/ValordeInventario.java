@@ -50,7 +50,7 @@ public class ValordeInventario extends javax.swing.JFrame {
     public ValordeInventario() {
         initComponents();
         setTitle("Inventario");
-       setSize(1300,830);
+       setSize(1350,700);
        setLocationRelativeTo(null);
        setResizable(false);
        setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -152,6 +152,7 @@ public class ValordeInventario extends javax.swing.JFrame {
                     "p.cantidad AS stockActual, " +
                     "p.precioVenta, " +
                     "p.precioDeCompra, " +
+                    "p.unidadMedida,"+
                     "(p.cantidad * p.precioVenta) AS valorTotal, " +
                     "(p.cantidad * p.precioDeCompra) AS costoTotal, " +
                     "((p.cantidad * p.precioVenta) - (p.cantidad * p.precioDeCompra)) AS gananciaTotal " +
@@ -171,13 +172,18 @@ public class ValordeInventario extends javax.swing.JFrame {
             while (rs.next()) {
                 String nombre = rs.getString("nombreProducto");
                 int stockActual = rs.getInt("stockActual");
+                String unidadMedida = rs.getString("unidadMedida");
                 double valorTotal = rs.getDouble("valorTotal");
                 double costoTotal = rs.getDouble("costoTotal");
                 double gananciaTotal = rs.getDouble("gananciaTotal");
                 
+                if(unidadMedida == null || unidadMedida.trim().isEmpty()){
+                    unidadMedida = "unidadMedida";
+                }
+                
                 Object[] fila = {
                     nombre,
-                    stockActual + " unidades",
+                   df.format(stockActual) + " " + unidadMedida,
                     "$" + df.format(valorTotal),
                     "$" + df.format(costoTotal),
                     "$" + df.format(gananciaTotal)
@@ -286,119 +292,126 @@ public class ValordeInventario extends javax.swing.JFrame {
     }
     
     private void exportarAPDF(File archivo) throws Exception {
-        Document document = new Document(PageSize.A4.rotate());
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(archivo));
-        
-        document.open();
-        
-        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.DARK_GRAY);
-        Font subtitleFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.GRAY);
-        Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
-        Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 9, BaseColor.BLACK);
-        Font summaryFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, BaseColor.BLACK);
-        
-        Paragraph title = new Paragraph("REPORTE DE VALOR DE INVENTARIO", titleFont);
-        title.setAlignment(Element.ALIGN_CENTER);
-        title.setSpacingAfter(5);
-        document.add(title);
-        
-        Paragraph subtitle = new Paragraph("ARCANGEL MIGUEL", titleFont);
-        subtitle.setAlignment(Element.ALIGN_CENTER);
-        subtitle.setSpacingAfter(10);
-        document.add(subtitle);
-        
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        Paragraph date = new Paragraph("Fecha de generación: " + sdf.format(new Date()), subtitleFont);
-        date.setAlignment(Element.ALIGN_CENTER);
-        date.setSpacingAfter(20);
-        document.add(date);
-        
-        DefaultTableModel model = (DefaultTableModel) JTableValor.getModel();
-        PdfPTable table = new PdfPTable(model.getColumnCount());
-        table.setWidthPercentage(100);
-        
-        float[] columnWidths = {3f, 2f, 2f, 2f, 2f};
-        table.setWidths(columnWidths);
-        
-        for (int i = 0; i < model.getColumnCount(); i++) {
-            PdfPCell headerCell = new PdfPCell(new Phrase(model.getColumnName(i), headerFont));
-            headerCell.setBackgroundColor(new BaseColor(0, 51, 153));
-            headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            headerCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            headerCell.setPadding(8);
-            table.addCell(headerCell);
-        }
-        
-        double totalValor = 0;
-        double totalCosto = 0;
-        double totalGanancia = 0;
-        
-        for (int i = 0; i < model.getRowCount(); i++) {
-            for (int j = 0; j < model.getColumnCount(); j++) {
-                Object value = model.getValueAt(i, j);
-                String strValue = value != null ? value.toString() : "";
-                
-                if (j == 2) {
-                    totalValor += parseMoney(strValue);
-                } else if (j == 3) {
-                    totalCosto += parseMoney(strValue);
-                } else if (j == 4) {
-                    totalGanancia += parseMoney(strValue);
-                }
-                
-                PdfPCell dataCell = new PdfPCell(new Phrase(strValue, dataFont));
-                
-                if (i % 2 == 0) {
-                    dataCell.setBackgroundColor(new BaseColor(240, 248, 255));
-                } else {
-                    dataCell.setBackgroundColor(BaseColor.WHITE);
-                }
-                
-                if (j == 0) {
-                    dataCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-                } else {
-                    dataCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                }
-                
-                dataCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                dataCell.setPadding(6);
-                table.addCell(dataCell);
-            }
-        }
-        
-        document.add(table);
-        
-        Paragraph summary = new Paragraph("\n\nRESUMEN FINANCIERO", summaryFont);
-        summary.setSpacingBefore(15);
-        summary.setSpacingAfter(10);
-        document.add(summary);
-        
-        Paragraph summaryDetails = new Paragraph(
-            "Total de productos: " + model.getRowCount() + "\n" +
-            "Valor total del inventario: $" + df.format(totalValor) + "\n" +
-            "Costo total del inventario: $" + df.format(totalCosto) + "\n" +
-            "Ganancia potencial total: $" + df.format(totalGanancia),
-            FontFactory.getFont(FontFactory.HELVETICA, 10)
-        );
-        document.add(summaryDetails);
-        
-        Paragraph footer = new Paragraph("\n\nGenerado por Sistema de Inventario Arcangel Miguel", 
-                                        FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 8, BaseColor.GRAY));
-        footer.setAlignment(Element.ALIGN_CENTER);
-        document.add(footer);
-        
-        document.close();
-        writer.close();
+    Document document = new Document(PageSize.A4.rotate());
+    PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(archivo));
+    
+    document.open();
+    
+    Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.DARK_GRAY);
+    Font subtitleFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.GRAY);
+    Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
+    Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 9, BaseColor.BLACK);
+    Font summaryFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, BaseColor.BLACK);
+    
+    Paragraph title = new Paragraph("REPORTE DE VALOR DE INVENTARIO", titleFont);
+    title.setAlignment(Element.ALIGN_CENTER);
+    title.setSpacingAfter(5);
+    document.add(title);
+    
+    Paragraph subtitle = new Paragraph("ARCANGEL MIGUEL", titleFont);
+    subtitle.setAlignment(Element.ALIGN_CENTER);
+    subtitle.setSpacingAfter(10);
+    document.add(subtitle);
+    
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    Paragraph date = new Paragraph("Fecha de generación: " + sdf.format(new Date()), subtitleFont);
+    date.setAlignment(Element.ALIGN_CENTER);
+    date.setSpacingAfter(20);
+    document.add(date);
+    
+    DefaultTableModel model = (DefaultTableModel) JTableValor.getModel();
+    PdfPTable table = new PdfPTable(model.getColumnCount());
+    table.setWidthPercentage(100);
+    
+    float[] columnWidths = {3f, 2f, 2f, 2f, 2f};
+    table.setWidths(columnWidths);
+    
+    for (int i = 0; i < model.getColumnCount(); i++) {
+        PdfPCell headerCell = new PdfPCell(new Phrase(model.getColumnName(i), headerFont));
+        headerCell.setBackgroundColor(new BaseColor(0, 51, 153));
+        headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        headerCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        headerCell.setPadding(8);
+        table.addCell(headerCell);
     }
     
-    private double parseMoney(String moneyString) {
-        try {
-            String cleaned = moneyString.replace("$", "").replace(",", "").trim();
-            return Double.parseDouble(cleaned);
-        } catch (Exception e) {
-            return 0.0;
+    double totalValor = 0;
+    double totalCosto = 0;
+    double totalGanancia = 0;
+    
+    for (int i = 0; i < model.getRowCount(); i++) {
+        for (int j = 0; j < model.getColumnCount(); j++) {
+            Object value = model.getValueAt(i, j);
+            String strValue = value != null ? value.toString() : "";
+            
+            // ✅ Sumar correctamente los valores
+            if (j == 2) {
+                totalValor += parseMoney(strValue);
+            } else if (j == 3) {
+                totalCosto += parseMoney(strValue);
+            } else if (j == 4) {
+                totalGanancia += parseMoney(strValue);
+            }
+            
+            PdfPCell dataCell = new PdfPCell(new Phrase(strValue, dataFont));
+            
+            if (i % 2 == 0) {
+                dataCell.setBackgroundColor(new BaseColor(240, 248, 255));
+            } else {
+                dataCell.setBackgroundColor(BaseColor.WHITE);
+            }
+            
+            if (j == 0) {
+                dataCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            } else {
+                dataCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            }
+            
+            dataCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            dataCell.setPadding(6);
+            table.addCell(dataCell);
         }
     }
+    
+    document.add(table);
+    
+    Paragraph summary = new Paragraph("\n\nRESUMEN FINANCIERO", summaryFont);
+    summary.setSpacingBefore(15);
+    summary.setSpacingAfter(10);
+    document.add(summary);
+    
+    Paragraph summaryDetails = new Paragraph(
+        "Total de productos: " + model.getRowCount() + "\n" +
+        "Valor total del inventario: $" + df.format(totalValor) + "\n" +
+        "Costo total del inventario: $" + df.format(totalCosto) + "\n" +
+        "Ganancia potencial total: $" + df.format(totalGanancia),
+        FontFactory.getFont(FontFactory.HELVETICA, 10)
+    );
+    document.add(summaryDetails);
+    
+    Paragraph footer = new Paragraph("\n\nGenerado por Sistema de Inventario Arcangel Miguel", 
+                                    FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 8, BaseColor.GRAY));
+    footer.setAlignment(Element.ALIGN_CENTER);
+    document.add(footer);
+    
+    document.close();
+    writer.close();
+}
+    
+   
+  private double parseMoney(String moneyString) {
+    try {
+        // Remover el símbolo $, comas y espacios
+        String cleaned = moneyString.replace("$", "")
+                                    .replace(",", "")
+                                    .replace(" ", "")
+                                    .trim();
+        return Double.parseDouble(cleaned);
+    } catch (Exception e) {
+        logger.log(java.util.logging.Level.WARNING, "Error parseando: " + moneyString, e);
+        return 0.0;
+    }
+}
     
     
     
@@ -620,9 +633,9 @@ public void TamanoImagen(){
                 lbl_iniMousePressed(evt);
             }
         });
-        Menu.add(lbl_ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
+        Menu.add(lbl_ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 160, 40));
+        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 170, 40));
 
         Menu1.setBackground(new java.awt.Color(0, 51, 255));
         Menu1.setForeground(new java.awt.Color(0, 153, 153));
@@ -646,9 +659,9 @@ public void TamanoImagen(){
                 lbl_ini1MousePressed(evt);
             }
         });
-        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
+        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 160, 40));
+        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 170, 40));
 
         Menu2.setBackground(new java.awt.Color(0, 51, 255));
         Menu2.setForeground(new java.awt.Color(0, 153, 153));
@@ -672,9 +685,9 @@ public void TamanoImagen(){
                 lbl_ini2MousePressed(evt);
             }
         });
-        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 160, 40));
+        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 170, 40));
 
         Menu3.setBackground(new java.awt.Color(0, 51, 255));
         Menu3.setForeground(new java.awt.Color(0, 153, 153));
@@ -698,9 +711,9 @@ public void TamanoImagen(){
                 lbl_ini3MousePressed(evt);
             }
         });
-        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 160, 40));
+        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 170, 40));
 
         Menu4.setBackground(new java.awt.Color(0, 51, 255));
         Menu4.setForeground(new java.awt.Color(0, 153, 153));
@@ -724,9 +737,9 @@ public void TamanoImagen(){
                 lbl_ini4MousePressed(evt);
             }
         });
-        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 160, 40));
+        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 170, 40));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 240, 830));
 
@@ -741,15 +754,15 @@ public void TamanoImagen(){
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/Imagenes/avatar (1).png"))); // NOI18N
         jLabel1.setText("jLabel1");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 10, 30, -1));
+        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 30, -1));
 
         Saludo.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Saludo.setForeground(new java.awt.Color(255, 255, 255));
         Saludo.setText("Dashboard");
         Saludo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 150, 30));
+        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 10, 150, 30));
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1060, 50));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1110, 50));
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -770,7 +783,7 @@ public void TamanoImagen(){
         JreporteGeneral.setText("Reporte General");
         jPanel4.add(JreporteGeneral, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 20, 180, -1));
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 1000, 70));
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 1050, 70));
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel4.setText("Buscar:");
@@ -793,7 +806,7 @@ public void TamanoImagen(){
         ));
         jScrollPane1.setViewportView(JTableValor);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 210, 1000, 590));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 210, 1050, 450));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -803,7 +816,9 @@ public void TamanoImagen(){
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 6, Short.MAX_VALUE))
         );
 
         pack();

@@ -65,7 +65,7 @@ public class Dashboard extends javax.swing.JFrame {
     public Dashboard() {
        initComponents();
        setTitle("Panel inicial");
-       setSize(1300,830);
+       setSize(1350,700);
        setLocationRelativeTo(null);
        setResizable(false);
        setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -746,9 +746,6 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel6 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         JVentasDia = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        JStockBajo = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         JNuevoProductos = new javax.swing.JLabel();
@@ -757,6 +754,9 @@ public class Dashboard extends javax.swing.JFrame {
         JGanacias = new javax.swing.JLabel();
         GraficasVM = new javax.swing.JPanel();
         GraficaBarras = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        JStockBajo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -796,9 +796,9 @@ public class Dashboard extends javax.swing.JFrame {
                 lbl_iniMousePressed(evt);
             }
         });
-        Menu.add(lbl_ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
+        Menu.add(lbl_ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 160, 40));
+        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 170, 40));
 
         Menu1.setBackground(new java.awt.Color(0, 51, 255));
         Menu1.setForeground(new java.awt.Color(0, 153, 153));
@@ -822,9 +822,9 @@ public class Dashboard extends javax.swing.JFrame {
                 lbl_ini1MousePressed(evt);
             }
         });
-        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
+        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 160, 40));
+        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 170, 40));
 
         Menu2.setBackground(new java.awt.Color(0, 51, 255));
         Menu2.setForeground(new java.awt.Color(0, 153, 153));
@@ -848,9 +848,9 @@ public class Dashboard extends javax.swing.JFrame {
                 lbl_ini2MousePressed(evt);
             }
         });
-        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 150, 32));
 
-        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 160, 40));
+        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 170, 40));
 
         Menu3.setBackground(new java.awt.Color(0, 51, 255));
         Menu3.setForeground(new java.awt.Color(0, 153, 153));
@@ -874,9 +874,9 @@ public class Dashboard extends javax.swing.JFrame {
                 lbl_ini3MousePressed(evt);
             }
         });
-        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 160, 40));
+        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 170, 40));
 
         Menu4.setBackground(new java.awt.Color(0, 51, 255));
         Menu4.setForeground(new java.awt.Color(0, 153, 153));
@@ -900,9 +900,9 @@ public class Dashboard extends javax.swing.JFrame {
                 lbl_ini4MousePressed(evt);
             }
         });
-        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 160, 40));
+        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 170, 40));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 240, 830));
 
@@ -917,15 +917,15 @@ public class Dashboard extends javax.swing.JFrame {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/Imagenes/avatar (1).png"))); // NOI18N
         jLabel1.setText("jLabel1");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 10, 30, -1));
+        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 30, -1));
 
         Saludo.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Saludo.setForeground(new java.awt.Color(255, 255, 255));
         Saludo.setText("Dashboard");
         Saludo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 150, 30));
+        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 10, 150, 30));
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1060, 50));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1110, 50));
 
         GraficasVD.setBackground(new java.awt.Color(255, 255, 255));
         GraficasVD.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -934,14 +934,14 @@ public class Dashboard extends javax.swing.JFrame {
         GraficasVD.setLayout(GraficasVDLayout);
         GraficasVDLayout.setHorizontalGroup(
             GraficasVDLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 618, Short.MAX_VALUE)
+            .addGap(0, 528, Short.MAX_VALUE)
         );
         GraficasVDLayout.setVerticalGroup(
             GraficasVDLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 258, Short.MAX_VALUE)
+            .addGap(0, 218, Short.MAX_VALUE)
         );
 
-        jPanel1.add(GraficasVD, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 520, 620, 260));
+        jPanel1.add(GraficasVD, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 430, 530, 220));
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
         jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -949,27 +949,13 @@ public class Dashboard extends javax.swing.JFrame {
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel5.setText("Ventas Del Dia");
-        jPanel6.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 130, -1));
+        jPanel6.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 10, 130, -1));
 
         JVentasDia.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         JVentasDia.setText("0");
         jPanel6.add(JVentasDia, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, -1, -1));
 
-        jPanel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 70, 240, 160));
-
-        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel6.setText("Stock Bajo");
-        jPanel7.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 10, 100, -1));
-
-        JStockBajo.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        JStockBajo.setText("0 Productos");
-        jPanel7.add(JStockBajo, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 60, -1, -1));
-
-        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 70, 240, 160));
+        jPanel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 60, 210, 140));
 
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
         jPanel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -983,7 +969,7 @@ public class Dashboard extends javax.swing.JFrame {
         JNuevoProductos.setText("0 Productos");
         jPanel8.add(JNuevoProductos, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 60, -1, -1));
 
-        jPanel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 70, 240, 160));
+        jPanel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 60, 240, 140));
 
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
         jPanel9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -995,9 +981,9 @@ public class Dashboard extends javax.swing.JFrame {
 
         JGanacias.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         JGanacias.setText("0");
-        jPanel9.add(JGanacias, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 60, -1, -1));
+        jPanel9.add(JGanacias, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 60, -1, -1));
 
-        jPanel1.add(jPanel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 70, 240, 160));
+        jPanel1.add(jPanel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 60, 240, 140));
 
         GraficasVM.setBackground(new java.awt.Color(255, 255, 255));
         GraficasVM.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -1006,14 +992,14 @@ public class Dashboard extends javax.swing.JFrame {
         GraficasVM.setLayout(GraficasVMLayout);
         GraficasVMLayout.setHorizontalGroup(
             GraficasVMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1028, Short.MAX_VALUE)
+            .addGap(0, 1058, Short.MAX_VALUE)
         );
         GraficasVMLayout.setVerticalGroup(
             GraficasVMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 268, Short.MAX_VALUE)
+            .addGap(0, 208, Short.MAX_VALUE)
         );
 
-        jPanel1.add(GraficasVM, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 240, 1030, 270));
+        jPanel1.add(GraficasVM, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 210, 1060, 210));
 
         GraficaBarras.setBackground(new java.awt.Color(255, 255, 255));
         GraficaBarras.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -1022,14 +1008,28 @@ public class Dashboard extends javax.swing.JFrame {
         GraficaBarras.setLayout(GraficaBarrasLayout);
         GraficaBarrasLayout.setHorizontalGroup(
             GraficaBarrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 398, Short.MAX_VALUE)
+            .addGap(0, 508, Short.MAX_VALUE)
         );
         GraficaBarrasLayout.setVerticalGroup(
             GraficaBarrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 258, Short.MAX_VALUE)
+            .addGap(0, 218, Short.MAX_VALUE)
         );
 
-        jPanel1.add(GraficaBarras, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 520, 400, 260));
+        jPanel1.add(GraficaBarras, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 430, 510, 220));
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel6.setText("Stock Bajo");
+        jPanel7.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 10, 100, -1));
+
+        JStockBajo.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        JStockBajo.setText("0 Productos");
+        jPanel7.add(JStockBajo, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 60, -1, -1));
+
+        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 60, 230, 140));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -1039,7 +1039,7 @@ public class Dashboard extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();

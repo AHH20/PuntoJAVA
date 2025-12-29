@@ -1,4 +1,3 @@
-
 package com.Ventas;
 
 import java.awt.Component;
@@ -9,9 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-
 public class CantidadRenderer extends JPanel implements TableCellRenderer {
-    
     
     private JButton btnMenos;
     private JLabel lblCantidad;
@@ -25,7 +22,7 @@ public class CantidadRenderer extends JPanel implements TableCellRenderer {
         btnMenos.setFocusPainted(false);
         
         lblCantidad = new JLabel("0");
-        lblCantidad.setPreferredSize(new java.awt.Dimension(30, 25));
+        lblCantidad.setPreferredSize(new java.awt.Dimension(40, 25));
         lblCantidad.setHorizontalAlignment(JLabel.CENTER);
         lblCantidad.setFont(new java.awt.Font("Segoe UI", 1, 14));
         
@@ -41,10 +38,23 @@ public class CantidadRenderer extends JPanel implements TableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
-        lblCantidad.setText(value != null ? value.toString() : "0");
+        
+        if (value != null) {
+            if (value instanceof Double) {
+                double cantidad = (Double) value;
+                // Si es entero, mostrar sin decimales
+                if (cantidad == Math.floor(cantidad)) {
+                    lblCantidad.setText(String.valueOf((int)cantidad));
+                } else {
+                    lblCantidad.setText(String.format("%.1f", cantidad));
+                }
+            } else {
+                lblCantidad.setText(value.toString());
+            }
+        } else {
+            lblCantidad.setText("0");
+        }
+        
         return this;
     }
 }
-    
- 
-

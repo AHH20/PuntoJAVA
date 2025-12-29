@@ -61,7 +61,7 @@ public class Inventario extends javax.swing.JFrame {
     public Inventario() {
        initComponents();
        setTitle("Inventario");
-       setSize(1300,830);
+       setSize(1350,700);
        setLocationRelativeTo(null);
        setResizable(false);
        setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -125,60 +125,67 @@ public class Inventario extends javax.swing.JFrame {
         cargarInventario("");
     }
     
-    private void cargarInventario(String busqueda) {
-        DefaultTableModel modelo = (DefaultTableModel) JTableReporte.getModel();
-        modelo.setRowCount(0);
+   private void cargarInventario(String busqueda) {
+    DefaultTableModel modelo = (DefaultTableModel) JTableReporte.getModel();
+    modelo.setRowCount(0);
+    
+    String sql = "SELECT " +
+                "p.nombreProducto, " +
+                "p.cantidad AS stockActual, " +
+                "p.unidadMedida, " +  // AGREGAR ESTA LÍNEA si tienes la columna
+                "COALESCE(SUM(dv.cantidad), 0) AS unidadesVendidas, " +
+                "p.precioVenta, " +
+                "(p.cantidad * p.precioVenta) AS valorTotal " +
+                "FROM Productos p " +
+                "LEFT JOIN DetalleVentas dv ON p.id = dv.idProducto " +
+                "WHERE p.nombreProducto LIKE ? OR p.codigoBarras LIKE ? " +
+                "GROUP BY p.id, p.nombreProducto, p.cantidad, p.unidadMedida, p.precioVenta " +
+                "ORDER BY p.nombreProducto";
+    
+    try (Connection conn = Conexion.conectar();
+         PreparedStatement pst = conn.prepareStatement(sql)) {
         
-        String sql = "SELECT " +
-                    "p.nombreProducto, " +
-                    "p.cantidad AS stockActual, " +
-                    "COALESCE(SUM(dv.cantidad), 0) AS unidadesVendidas, " +
-                    "p.precioVenta, " +
-                    "(p.cantidad * p.precioVenta) AS valorTotal " +
-                    "FROM Productos p " +
-                    "LEFT JOIN DetalleVentas dv ON p.id = dv.idProducto " +
-                    "WHERE p.nombreProducto LIKE ? OR p.codigoBarras LIKE ? " +
-                    "GROUP BY p.id, p.nombreProducto, p.cantidad, p.precioVenta " +
-                    "ORDER BY p.nombreProducto";
+        String parametroBusqueda = "%" + busqueda + "%";
+        pst.setString(1, parametroBusqueda);
+        pst.setString(2, parametroBusqueda);
         
-        try (Connection conn = Conexion.conectar();
-             PreparedStatement pst = conn.prepareStatement(sql)) {
+        ResultSet rs = pst.executeQuery();
+        
+        while (rs.next()) {
+            String nombre = rs.getString("nombreProducto");
+            double stockActual = rs.getDouble("stockActual");
+            String unidadMedida = rs.getString("unidadMedida"); // OBTENER UNIDAD
+            double unidadesVendidas = rs.getDouble("unidadesVendidas");
+            double precioVenta = rs.getDouble("precioVenta");
+            double valorTotal = rs.getDouble("valorTotal");
             
-            String parametroBusqueda = "%" + busqueda + "%";
-            pst.setString(1, parametroBusqueda);
-            pst.setString(2, parametroBusqueda);
+            String nivelRotacion = calcularNivelRotacion((int)unidadesVendidas, (int)stockActual);
             
-            ResultSet rs = pst.executeQuery();
-            
-            while (rs.next()) {
-                String nombre = rs.getString("nombreProducto");
-                int stockActual = rs.getInt("stockActual");
-                int unidadesVendidas = rs.getInt("unidadesVendidas");
-                double precioVenta = rs.getDouble("precioVenta");
-                double valorTotal = rs.getDouble("valorTotal");
-                
-                String nivelRotacion = calcularNivelRotacion(unidadesVendidas, stockActual);
-                
-                Object[] fila = {
-                    nombre,
-                    stockActual + " unidades",
-                    unidadesVendidas + " unidades",
-                    "$" + df.format(valorTotal),
-                    "$" + df.format(precioVenta),
-                    nivelRotacion
-                };
-                
-                modelo.addRow(fila);
+            // Si no tiene unidad definida, usar "unidades" por defecto
+            if (unidadMedida == null || unidadMedida.trim().isEmpty()) {
+                unidadMedida = "unidades";
             }
             
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, 
-                "Error al cargar inventario: " + e.getMessage(), 
-                "Error", 
-                JOptionPane.ERROR_MESSAGE);
-            logger.log(java.util.logging.Level.SEVERE, "Error al cargar inventario", e);
+            Object[] fila = {
+                nombre,
+                df.format(stockActual) + " " + unidadMedida,  // CAMBIO AQUÍ
+                df.format(unidadesVendidas) + " " + unidadMedida,  // CAMBIO AQUÍ
+                "$" + df.format(valorTotal),
+                "$" + df.format(precioVenta),
+                nivelRotacion
+            };
+            
+            modelo.addRow(fila);
         }
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, 
+            "Error al cargar inventario: " + e.getMessage(), 
+            "Error", 
+            JOptionPane.ERROR_MESSAGE);
+        logger.log(java.util.logging.Level.SEVERE, "Error al cargar inventario", e);
     }
+}
     
     private String calcularNivelRotacion(int unidadesVendidas, int stockActual) {
         if (stockActual == 0) {
@@ -790,7 +797,7 @@ private void navegarAValorInventario() {
         ));
         jScrollPane1.setViewportView(JTableReporte);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 210, 1000, 610));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 210, 1050, 450));
 
         jPanel3.setBackground(new java.awt.Color(135, 206, 250));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -803,15 +810,15 @@ private void navegarAValorInventario() {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/Imagenes/avatar (1).png"))); // NOI18N
         jLabel1.setText("jLabel1");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 10, 30, -1));
+        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 30, -1));
 
         Saludo.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Saludo.setForeground(new java.awt.Color(255, 255, 255));
         Saludo.setText("Dashboard");
         Saludo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 150, 30));
+        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 10, 150, 30));
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1060, 50));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1110, 50));
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -832,7 +839,7 @@ private void navegarAValorInventario() {
         JreporteGeneral.setText("Reporte General");
         jPanel4.add(JreporteGeneral, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 20, 180, -1));
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 1000, 70));
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 1050, 70));
 
         jTextField1.setBackground(new java.awt.Color(255, 255, 255));
         jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -846,11 +853,15 @@ private void navegarAValorInventario() {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1303, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 6, Short.MAX_VALUE))
         );
 
         pack();

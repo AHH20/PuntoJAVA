@@ -69,7 +69,7 @@ public class nuevaVenta extends javax.swing.JFrame {
     public nuevaVenta() {
        initComponents();
        setTitle("Ventas");
-       setSize(1300,830);
+       setSize(1350,700);
        setLocationRelativeTo(null);
        setResizable(false);
        setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -176,14 +176,14 @@ public class nuevaVenta extends javax.swing.JFrame {
         while (rs.next()) {
             String nombre = rs.getString("nombreProducto");
             BigDecimal precioVenta = rs.getBigDecimal("precioVenta");
-            int stock = rs.getInt("cantidad");
+            double stock = rs.getDouble("cantidad");
             
             productosEncontrados.add(nombre);
             
             if (stock > 0) {
                 // Verificar si ya está en la tabla
                 boolean encontrado = false;
-                int cantidadActual = 0;
+                double cantidadActual = 0;
                 for (int i = 0; i < modeloTabla.getRowCount(); i++) {
                     if (modeloTabla.getValueAt(i, 0).equals(nombre)) {
                         encontrado = true;
@@ -208,7 +208,7 @@ public class nuevaVenta extends javax.swing.JFrame {
         // Eliminar productos que NO coinciden con la búsqueda y tienen cantidad 0
         for (int i = modeloTabla.getRowCount() - 1; i >= 0; i--) {
             String nombreEnTabla = modeloTabla.getValueAt(i, 0).toString();
-            int cantidad = Integer.parseInt(modeloTabla.getValueAt(i, 1).toString());
+            double cantidad = Double.parseDouble(modeloTabla.getValueAt(i, 1).toString());
             
             // Si el producto no está en los encontrados Y tiene cantidad 0, eliminarlo
             if (!productosEncontrados.contains(nombreEnTabla) && cantidad == 0) {
@@ -228,7 +228,7 @@ public class nuevaVenta extends javax.swing.JFrame {
    
    private void limpiarProductosSinCantidad() {
     for (int i = modeloTabla.getRowCount() - 1; i >= 0; i--) {
-        int cantidad = Integer.parseInt(modeloTabla.getValueAt(i, 1).toString());
+        double cantidad = Double.parseDouble(modeloTabla.getValueAt(i, 1).toString());
         if (cantidad == 0) {
             modeloTabla.removeRow(i);
         }
@@ -239,7 +239,7 @@ public class nuevaVenta extends javax.swing.JFrame {
         totalPagar = BigDecimal.ZERO;
         
         for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-            int cantidad = Integer.parseInt(modeloTabla.getValueAt(i, 1).toString());
+            double cantidad = Double.parseDouble(modeloTabla.getValueAt(i, 1).toString());
             
             Object precioObj = modeloTabla.getValueAt(i, 2);
             BigDecimal precio = (precioObj instanceof BigDecimal) ? 
@@ -322,58 +322,66 @@ public class nuevaVenta extends javax.swing.JFrame {
      
      
     
-   private void mostrarTicket(int idVenta, java.util.List<itemVentas> productos,
-                          BigDecimal total, BigDecimal efectivo, BigDecimal cambio) {
+ private void mostrarTicket(int idVenta, java.util.List<itemVentas> productos,
+                      BigDecimal total, BigDecimal efectivo, BigDecimal cambio) {
+    
+    StringBuilder ticket = new StringBuilder();
+    ticket.append("═══════════════════════════════════\n");
+    ticket.append("     ARCÁNGEL MIGUEL\n");
+    ticket.append("     Papelería y Regalos\n");
+    ticket.append("═══════════════════════════════════\n");
+    ticket.append(String.format("Ticket #%d\n", idVenta));
+    ticket.append(String.format("Fecha: %s\n", 
+        new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())));
+    
+    String nombreCajero = (Login.SesionUsuario.NombreUsuario != null) ? 
+        Login.SesionUsuario.NombreUsuario : "Cajero";
+    ticket.append(String.format("Cajero: %s\n", nombreCajero));
+    
+    ticket.append("───────────────────────────────────\n");
+    ticket.append("PRODUCTO         CANT  P.UNIT TOTAL\n");
+    ticket.append("───────────────────────────────────\n");
+    
+    for (itemVentas item : productos) {
+        String nombreCorto = item.getNombreProducto().length() > 15 ? 
+            item.getNombreProducto().substring(0, 12) + "..." : item.getNombreProducto();
         
-        StringBuilder ticket = new StringBuilder();
-        ticket.append("═══════════════════════════════════\n");
-        ticket.append("     ARCÁNGEL MIGUEL\n");
-        ticket.append("     Papelería y Regalos\n");
-        ticket.append("═══════════════════════════════════\n");
-        ticket.append(String.format("Ticket #%d\n", idVenta));
-        ticket.append(String.format("Fecha: %s\n", 
-            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())));
-        
-        String nombreCajero = (Login.SesionUsuario.NombreUsuario != null) ? 
-            Login.SesionUsuario.NombreUsuario : "Cajero";
-        ticket.append(String.format("Cajero: %s\n", nombreCajero));
-        
-        ticket.append("───────────────────────────────────\n");
-        ticket.append("PRODUCTO         CANT  P.UNIT TOTAL\n");
-        ticket.append("───────────────────────────────────\n");
-        
-        for (itemVentas item : productos) {
-            String nombreCorto = item.getNombreProducto().length() > 15 ? 
-                item.getNombreProducto().substring(0, 12) + "..." : item.getNombreProducto();
-            
-            ticket.append(String.format("%-15s %4d %6.2f %6.2f\n", 
-                nombreCorto, 
-                item.getCantidad(), 
-                item.getPrecioUnitario(),
-                item.getSubtotal()));
+        // ✅ Formatear cantidad correctamente (entero o decimal)
+        String cantidadStr;
+        if (item.getCantidad() == Math.floor(item.getCantidad())) {
+            cantidadStr = String.format("%.0f", item.getCantidad());
+        } else {
+            cantidadStr = String.format("%.1f", item.getCantidad());
         }
         
-        ticket.append("───────────────────────────────────\n");
-        ticket.append(String.format("TOTAL:                    $%7.2f\n", total));
-        ticket.append(String.format("EFECTIVO:                 $%7.2f\n", efectivo));
-        ticket.append(String.format("CAMBIO:                   $%7.2f\n", cambio));
-        ticket.append("═══════════════════════════════════\n");
-        ticket.append("    ¡Gracias por su compra!\n");
-        ticket.append("═══════════════════════════════════\n");
-        
-        javax.swing.JTextArea textArea = new javax.swing.JTextArea(ticket.toString());
-        textArea.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
-        textArea.setEditable(false);
-        textArea.setBackground(java.awt.Color.WHITE);
-        
-        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
-        scrollPane.setPreferredSize(new java.awt.Dimension(400, 400));
-        
-        JOptionPane.showMessageDialog(this,
-            scrollPane,
-            "Ticket de Venta",
-            JOptionPane.INFORMATION_MESSAGE);
+        ticket.append(String.format("%-15s %5s %6.2f %6.2f\n", 
+            nombreCorto, 
+            cantidadStr,
+            item.getPrecioUnitario(),
+            item.getSubtotal()));
     }
+    
+    ticket.append("───────────────────────────────────\n");
+    ticket.append(String.format("TOTAL:                    $%7.2f\n", total));
+    ticket.append(String.format("EFECTIVO:                 $%7.2f\n", efectivo));
+    ticket.append(String.format("CAMBIO:                   $%7.2f\n", cambio));
+    ticket.append("═══════════════════════════════════\n");
+    ticket.append("    ¡Gracias por su compra!\n");
+    ticket.append("═══════════════════════════════════\n");
+    
+    javax.swing.JTextArea textArea = new javax.swing.JTextArea(ticket.toString());
+    textArea.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
+    textArea.setEditable(false);
+    textArea.setBackground(java.awt.Color.WHITE);
+    
+    javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
+    scrollPane.setPreferredSize(new java.awt.Dimension(400, 400));
+    
+    JOptionPane.showMessageDialog(this,
+        scrollPane,
+        "Ticket de Venta",
+        JOptionPane.INFORMATION_MESSAGE);
+}
     
     private void confirmarVenta() {
         if (modeloTabla.getRowCount() == 0) {
@@ -387,7 +395,7 @@ public class nuevaVenta extends javax.swing.JFrame {
         // Validar que haya al menos un producto con cantidad > 0
         boolean hayProductosConCantidad = false;
         for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-            int cantidad = Integer.parseInt(modeloTabla.getValueAt(i, 1).toString());
+            double cantidad = Double.parseDouble(modeloTabla.getValueAt(i, 1).toString());
             if (cantidad > 0) {
                 hayProductosConCantidad = true;
                 break;
@@ -505,137 +513,149 @@ public class nuevaVenta extends javax.swing.JFrame {
         
     }
     
-    private void guardarVentaEnBD(BigDecimal efectivo, BigDecimal cambio, boolean imprimirTicket) {
-    try {
-         if (TablaCompra.isEditing()) {
-            TablaCompra.getCellEditor().stopCellEditing();
-        }
-        java.util.List<itemVentas> productos = new java.util.ArrayList<>();
-        Conexion conexion = new Conexion();
-        
-        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-            String nombreProducto = modeloTabla.getValueAt(i, 0).toString();
-            int cantidad = Integer.parseInt(modeloTabla.getValueAt(i, 1).toString());
-            
-            if (cantidad <= 0) {
-                continue;
+     private void guardarVentaEnBD(BigDecimal efectivo, BigDecimal cambio, boolean imprimirTicket) {
+        try {
+            if (TablaCompra.isEditing()) {
+                TablaCompra.getCellEditor().stopCellEditing();
             }
             
-            Object precioObj = modeloTabla.getValueAt(i, 2);
-            BigDecimal precio = (precioObj instanceof BigDecimal) ? 
-                (BigDecimal) precioObj : new BigDecimal(precioObj.toString());
+            java.util.List<itemVentas> productos = new java.util.ArrayList<>();
+            Conexion conexion = new Conexion();
             
-            BigDecimal subtotal = precio.multiply(new BigDecimal(cantidad));
-            
-            String sql = "SELECT id FROM Productos WHERE nombreProducto = ?";
-            PreparedStatement ps = conexion.conectar().prepareStatement(sql);
-            ps.setString(1, nombreProducto);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                int idProducto = rs.getInt("id");
+            for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+                String nombreProducto = modeloTabla.getValueAt(i, 0).toString();
+                double cantidad = Double.parseDouble(modeloTabla.getValueAt(i, 1).toString());
                 
-                itemVentas item = new itemVentas(
-                    idProducto, 
-                    nombreProducto, 
-                    cantidad, 
-                    precio,
-                    subtotal
-                );
-                productos.add(item);
+                if (cantidad <= 0) {
+                    continue;
+                }
+                
+                Object precioObj = modeloTabla.getValueAt(i, 2);
+                BigDecimal precio = (precioObj instanceof BigDecimal) ? 
+                    (BigDecimal) precioObj : new BigDecimal(precioObj.toString());
+                
+                BigDecimal subtotal = precio.multiply(new BigDecimal(cantidad));
+                
+                String sql = "SELECT id FROM Productos WHERE nombreProducto = ?";
+                PreparedStatement ps = conexion.conectar().prepareStatement(sql);
+                ps.setString(1, nombreProducto);
+                ResultSet rs = ps.executeQuery();
+                
+                if (rs.next()) {
+                    int idProducto = rs.getInt("id");
+                    
+                    itemVentas item = new itemVentas(
+                        idProducto, 
+                        nombreProducto, 
+                        cantidad, 
+                        precio,
+                        subtotal
+                    );
+                    productos.add(item);
+                }
+                
+                rs.close();
+                ps.close();
             }
             
-            rs.close();
-            ps.close();
-        }
-        
-        if (productos.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Debe agregar cantidad a los productos",
-                "Advertencia",
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        addVentas ventaController = new addVentas();
-        int idVenta = ventaController.guardarVenta(
-            Login.SesionUsuario.id, 
-            productos,
-            totalPagar,
-            efectivo,
-            cambio
-        );
-        
-        if (idVenta > 0) {
-            // ⭐ GUARDAR COPIAS DE LOS VALORES ANTES DE LIMPIAR
-            BigDecimal totalFinal = totalPagar;
-            BigDecimal efectivoFinal = efectivo;
-            BigDecimal cambioFinal = cambio;
-            java.util.List<itemVentas> productosVendidos = new java.util.ArrayList<>(productos);
+            if (productos.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                    "Debe agregar cantidad a los productos",
+                    "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             
-            String nombreCajero = (Login.SesionUsuario.NombreUsuario != null) ? 
-                Login.SesionUsuario.NombreUsuario : "Cajero";
+            addVentas ventaController = new addVentas();
+            int idVenta = ventaController.guardarVenta(
+                Login.SesionUsuario.id, 
+                productos,
+                totalPagar,
+                efectivo,
+                cambio
+            );
             
-            // ⭐ AHORA SÍ LIMPIAR LA INTERFAZ
-            limpiarVenta();
-            actualizarInventarioEnOtrasVentanas();
-            Navegation.actualizarInventario();
-            
-            if (imprimirTicket) {
-                boolean impreso = impresoraTermica.imprimirTicket(
-                    idVenta, 
-                    productosVendidos,  // ⭐ Usar la copia guardada
-                    totalFinal,         // ⭐ Usar el valor guardado
-                    efectivoFinal,      // ⭐ Usar el valor guardado
-                    cambioFinal,        // ⭐ Usar el valor guardado
-                    nombreCajero
-                );
+            if (idVenta > 0) {
+                BigDecimal totalFinal = totalPagar;
+                BigDecimal efectivoFinal = efectivo;
+                BigDecimal cambioFinal = cambio;
+                java.util.List<itemVentas> productosVendidos = new java.util.ArrayList<>(productos);
                 
-                if (impreso) {
+                String nombreCajero = (Login.SesionUsuario.NombreUsuario != null) ? 
+                    Login.SesionUsuario.NombreUsuario : "Cajero";
+                
+                limpiarVenta();
+                actualizarInventarioEnOtrasVentanas();
+                Navegation.actualizarInventario();
+                
+                // ⭐ ACTUALIZAR VENTANA DE VENTAS EN TIEMPO REAL
+                if (Navegation.Ventas != null && Navegation.Ventas.isDisplayable()) {
+                    java.awt.EventQueue.invokeLater(() -> {
+                        try {
+                            // Recargar el historial de ventas
+                            Navegation.Ventas.dispose();
+                            Navegation.Ventas = new Ventas();
+                        } catch (Exception ex) {
+                            logger.log(java.util.logging.Level.WARNING, "Error actualizando Ventas", ex);
+                        }
+                    });
+                }
+                
+                if (imprimirTicket) {
+                    boolean impreso = impresoraTermica.imprimirTicket(
+                        idVenta, 
+                        productosVendidos,
+                        totalFinal,
+                        efectivoFinal,
+                        cambioFinal,
+                        nombreCajero
+                    );
+                    
+                    if (impreso) {
+                        JOptionPane.showMessageDialog(this,
+                            String.format(
+                                "✓ Venta #%d realizada correctamente\n" +
+                                "✓ Ticket impreso en impresora térmica",
+                                idVenta
+                            ),
+                            "Venta Exitosa",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        int verEnPantalla = JOptionPane.showConfirmDialog(this,
+                            String.format(
+                                "✓ Venta #%d guardada exitosamente\n\n" +
+                                "⚠ NO SE PUDO IMPRIMIR el ticket\n" +
+                                "La impresora no está conectada o no responde\n\n" +
+                                "¿Desea ver el ticket en pantalla?",
+                                idVenta
+                            ),
+                            "Impresora No Disponible",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+                        
+                        if (verEnPantalla == JOptionPane.YES_OPTION) {
+                            mostrarTicket(idVenta, productosVendidos, totalFinal, efectivoFinal, cambioFinal);
+                        }
+                    }
+                } else {
                     JOptionPane.showMessageDialog(this,
                         String.format(
                             "✓ Venta #%d realizada correctamente\n" +
-                            "✓ Ticket impreso en impresora térmica",
+                            "(Sin ticket impreso)",
                             idVenta
                         ),
                         "Venta Exitosa",
                         JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    int verEnPantalla = JOptionPane.showConfirmDialog(this,
-                        String.format(
-                            "✓ Venta #%d guardada exitosamente\n\n" +
-                            "⚠ NO SE PUDO IMPRIMIR el ticket\n" +
-                            "La impresora no está conectada o no responde\n\n" +
-                            "¿Desea ver el ticket en pantalla?",
-                            idVenta
-                        ),
-                        "Impresora No Disponible",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE);
-                    
-                    if (verEnPantalla == JOptionPane.YES_OPTION) {
-                        mostrarTicket(idVenta, productosVendidos, totalFinal, efectivoFinal, cambioFinal);
-                    }
                 }
-            } else {
-                JOptionPane.showMessageDialog(this,
-                    String.format(
-                        "✓ Venta #%d realizada correctamente\n" +
-                        "(Sin ticket impreso)",
-                        idVenta
-                    ),
-                    "Venta Exitosa",
-                    JOptionPane.INFORMATION_MESSAGE);
             }
+        } catch (Exception e) {
+            logger.log(java.util.logging.Level.SEVERE, "Error al guardar venta", e);
+            JOptionPane.showMessageDialog(this,
+                "Error al procesar la venta:\n" + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
         }
-    } catch (Exception e) {
-        logger.log(java.util.logging.Level.SEVERE, "Error al guardar venta", e);
-        JOptionPane.showMessageDialog(this,
-            "Error al procesar la venta:\n" + e.getMessage(),
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
     }
-}
     
     
     public Icon getIcon( String ruta, int width, int height){
@@ -725,9 +745,9 @@ public class nuevaVenta extends javax.swing.JFrame {
                 lbl_iniMousePressed(evt);
             }
         });
-        Menu.add(lbl_ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
+        Menu.add(lbl_ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 160, 40));
+        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 170, 40));
 
         Menu1.setBackground(new java.awt.Color(0, 51, 255));
         Menu1.setForeground(new java.awt.Color(0, 153, 153));
@@ -751,9 +771,9 @@ public class nuevaVenta extends javax.swing.JFrame {
                 lbl_ini1MousePressed(evt);
             }
         });
-        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
+        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 160, 40));
+        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 170, 40));
 
         Menu2.setBackground(new java.awt.Color(0, 51, 255));
         Menu2.setForeground(new java.awt.Color(0, 153, 153));
@@ -777,9 +797,9 @@ public class nuevaVenta extends javax.swing.JFrame {
                 lbl_ini2MousePressed(evt);
             }
         });
-        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 160, 40));
+        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 170, 40));
 
         Menu3.setBackground(new java.awt.Color(0, 51, 255));
         Menu3.setForeground(new java.awt.Color(0, 153, 153));
@@ -803,9 +823,9 @@ public class nuevaVenta extends javax.swing.JFrame {
                 lbl_ini3MousePressed(evt);
             }
         });
-        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 150, 32));
 
-        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 160, 40));
+        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 170, 40));
 
         Menu4.setBackground(new java.awt.Color(0, 51, 255));
         Menu4.setForeground(new java.awt.Color(0, 153, 153));
@@ -829,9 +849,9 @@ public class nuevaVenta extends javax.swing.JFrame {
                 lbl_ini4MousePressed(evt);
             }
         });
-        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 150, 32));
 
-        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 160, 40));
+        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 170, 40));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 240, 830));
 
@@ -848,7 +868,7 @@ public class nuevaVenta extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(TablaCompra);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, 690, 580));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, 690, 500));
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -862,7 +882,7 @@ public class nuevaVenta extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel4.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 530, 90, 40));
+        jPanel4.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 410, 90, 40));
 
         jButton2.setBackground(new java.awt.Color(0, 191, 255));
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
@@ -872,7 +892,7 @@ public class nuevaVenta extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel4.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 530, 90, 40));
+        jPanel4.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 410, 90, 40));
 
         JTextEfectivo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -910,7 +930,7 @@ public class nuevaVenta extends javax.swing.JFrame {
         txtCambio.setText("jLabel10");
         jPanel4.add(txtCambio, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 330, -1, 30));
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 160, 270, 580));
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 160, 270, 490));
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel9.setText("Buscar Producto");
@@ -930,15 +950,15 @@ public class nuevaVenta extends javax.swing.JFrame {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/Imagenes/avatar (1).png"))); // NOI18N
         jLabel1.setText("jLabel1");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 10, 30, -1));
+        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 30, -1));
 
         Saludo.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Saludo.setForeground(new java.awt.Color(255, 255, 255));
         Saludo.setText("Dashboard");
         Saludo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 150, 30));
+        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 10, 150, 30));
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1060, 50));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1110, 50));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -948,7 +968,7 @@ public class nuevaVenta extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 706, Short.MAX_VALUE)
         );
 
         pack();

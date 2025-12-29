@@ -19,10 +19,11 @@ public class EntidadProductos {
    private  int idCategoria ;
     BigDecimal precioDeCompra;
     BigDecimal precioVenta;
-    int Cantidad;
+    double Cantidad;
+    String unidadMedida;
     
     
-    
+    public EntidadProductos() {}
     
     
    public int getId() {
@@ -75,12 +76,20 @@ public class EntidadProductos {
         this.precioVenta = precioVenta;
     }
 
-    public int getCantidad() {
+    public double getCantidad() {
         return Cantidad;
     }
 
-    public void setCantidad(int Cantidad) {
+    public void setCantidad(double Cantidad) {
         this.Cantidad = Cantidad;
+    }
+    
+    public String getUnidadMedida() {
+        return unidadMedida;
+    }
+    
+    public void setUnidadMedida(String unidadMedida) {
+        this.unidadMedida = unidadMedida;
     }
     
    

@@ -24,14 +24,14 @@ import java.sql.Connection;
 public class addProducto {
     
     // Agregar productos
-    public void agregarProductos(JTextField nombreProducto, JTextField codigoBarras, JComboBox idCategoria, JTextField precioDeCompra, JTextField precioVenta,JTextField cantidad){
+    public void agregarProductos(JTextField nombreProducto, JTextField codigoBarras, JComboBox idCategoria, JTextField precioDeCompra, JTextField precioVenta,JTextField cantidad, JComboBox<String> unidadMedida){
         
         Conexion ConexionProducto = new Conexion();
         EntidadProductos entityProducto = new EntidadProductos();
         
 
         
-        String Consulta = "INSERT INTO Productos(nombreProducto,codigoBarras,idCategoria,precioDeCompra,precioVenta,cantidad)VALUES(?,?,?,?,?,?)";
+        String Consulta = "INSERT INTO Productos(nombreProducto,codigoBarras,idCategoria,precioDeCompra,precioVenta,cantidad,unidadMedida)VALUES(?,?,?,?,?,?,?)";
         
         
         try{
@@ -39,7 +39,8 @@ public class addProducto {
              entityProducto.setCodigoBarras(codigoBarras.getText());
                entityProducto.setPrecioDeCompra(new BigDecimal(precioDeCompra.getText()));
                 entityProducto.setPrecioVenta(new BigDecimal(precioVenta.getText()));
-                 entityProducto.setCantidad(Integer.parseInt(cantidad.getText()));
+                 entityProducto.setCantidad(Double.parseDouble(cantidad.getText()));
+                 entityProducto.setUnidadMedida(unidadMedida.getSelectedItem().toString());
                  
          itemCategoria categoria = (itemCategoria) idCategoria.getSelectedItem();
         if (categoria != null) {
@@ -52,7 +53,8 @@ public class addProducto {
             cs.setInt(3, entityProducto.getIdCategoria());
             cs.setBigDecimal(4, entityProducto.getPrecioDeCompra());
             cs.setBigDecimal(5, entityProducto.getPrecioVenta());
-            cs.setInt(6, entityProducto.getCantidad());
+            cs.setDouble(6, entityProducto.getCantidad());
+            cs.setString(7, entityProducto.getUnidadMedida());
              
            cs.execute();
            
@@ -101,7 +103,9 @@ public class addProducto {
     modelo.addColumn("id");            
     modelo.addColumn("CodigoBarras");  
     modelo.addColumn("IDCategoria");   
-    modelo.addColumn("PrecioCompra");  
+    modelo.addColumn("PrecioCompra"); 
+    modelo.addColumn("UnidadMedida");
+    modelo.addColumn("CantidadNumero");
     
     tablaMuestraProducto.setModel(modelo);
     tablaMuestraProducto.setRowHeight(30);
@@ -110,7 +114,7 @@ public class addProducto {
 
     String Consulta = 
     "SELECT p.id, p.nombreProducto, p.codigoBarras, p.idCategoria, c.nombreCategoria, " +
-    "p.precioDeCompra, p.precioVenta, p.cantidad " +
+    "p.precioDeCompra, p.precioVenta, p.cantidad, p.unidadMedida " +
     "FROM Productos p INNER JOIN Categorias c ON p.idCategoria = c.id";
     
     try{
@@ -118,20 +122,33 @@ public class addProducto {
         ResultSet rs = st.executeQuery(Consulta);
         
         while(rs.next()){
+            
+            double cantidad = rs.getDouble("cantidad");
+            String unidadMedida = rs.getString("unidadMedida");
+            if (unidadMedida == null) unidadMedida = "unidad";
+            
+            String cantidadStr;
+                if (cantidad == Math.floor(cantidad)) {
+                    cantidadStr = String.format("%.0f %s", cantidad, unidadMedida);
+                } else {
+                    cantidadStr = String.format("%.2f %s", cantidad, unidadMedida);
+                }
 
             modelo.addRow(new Object[]{
          
                 rs.getString("nombreProducto"),      
                 rs.getString("nombreCategoria"),    
                 rs.getBigDecimal("precioVenta"),     
-                rs.getInt("cantidad"),               
+                cantidadStr,           
                 "Editar",                            
                 "Eliminar",                          
              
                 rs.getInt("id"),                    
                 rs.getString("codigoBarras"),        
                 rs.getInt("idCategoria"),           
-                rs.getBigDecimal("precioDeCompra")   
+                rs.getBigDecimal("precioDeCompra"),
+                unidadMedida,
+                cantidad
             });
         }
         
@@ -142,6 +159,8 @@ public class addProducto {
         OcultarC(tablaMuestraProducto, 7);
         OcultarC(tablaMuestraProducto, 8);
         OcultarC(tablaMuestraProducto, 9);
+        OcultarC(tablaMuestraProducto,10);
+        OcultarC(tablaMuestraProducto,11);
         
 
         tablaMuestraProducto.getColumn("Editar")
@@ -177,13 +196,13 @@ public class addProducto {
      public void actualizarProducto(int idProducto, JTextField nombreProducto, 
                                JTextField codigoBarras, JComboBox idCategoria, 
                                JTextField precioDeCompra, JTextField precioVenta, 
-                               JTextField cantidad){
+                               JTextField cantidad, JComboBox<String> unidadMedida){
     
     Conexion ConexionProducto = new Conexion();
     EntidadProductos entityProductos = new EntidadProductos();
     
     String Consulta = "UPDATE Productos SET nombreProducto=?, codigoBarras=?, " +
-                      "idCategoria=?, precioDeCompra=?, precioVenta=?, cantidad=? " +
+                      "idCategoria=?, precioDeCompra=?, precioVenta=?, cantidad=?, unidadMedida=? " +
                       "WHERE id=?";
     
     try{
@@ -191,7 +210,8 @@ public class addProducto {
         entityProductos.setCodigoBarras(codigoBarras.getText().trim());
         entityProductos.setPrecioDeCompra(new BigDecimal(precioDeCompra.getText().trim()));
         entityProductos.setPrecioVenta(new BigDecimal(precioVenta.getText().trim()));
-        entityProductos.setCantidad(Integer.parseInt(cantidad.getText().trim()));
+        entityProductos.setCantidad(Double.parseDouble(cantidad.getText().trim()));
+        entityProductos.setUnidadMedida(unidadMedida.getSelectedItem().toString());
         
         itemCategoria categoria = (itemCategoria) idCategoria.getSelectedItem();
         if (categoria != null) {
@@ -204,8 +224,9 @@ public class addProducto {
             cs.setInt(3, entityProductos.getIdCategoria());
             cs.setBigDecimal(4, entityProductos.getPrecioDeCompra());
             cs.setBigDecimal(5, entityProductos.getPrecioVenta());
-            cs.setInt(6, entityProductos.getCantidad());
-            cs.setInt(7, idProducto); // ✅ Usar el int directamente
+            cs.setDouble(6, entityProductos.getCantidad());
+            cs.setString(7, entityProductos.getUnidadMedida());
+            cs.setInt(8, idProducto); // ✅ Usar el int directamente
             
             int filasActualizadas = cs.executeUpdate();
             

@@ -39,10 +39,11 @@ public class NewJDialog extends javax.swing.JDialog {
         this.parent = (GestionProductos) parent;
         setUndecorated(true);
         initComponents();
-        setSize(500,500);
+        setSize(480,560);
         setLocationRelativeTo(parent);
         setLocation(getX() + 60, getY() +30);
         setResizable(false);
+        
         GuardarCombox();
       
         
@@ -53,7 +54,7 @@ public class NewJDialog extends javax.swing.JDialog {
     public NewJDialog(java.awt.Frame parent, boolean modal, 
                       int idProducto, String codigoBarras, String nombre,
                       int idCategoria, String precioCompra, String precioVenta, 
-                      int cantidad) {
+                      int cantidad, String unidadMedida) {
         super(parent, modal);
         this.parent = (GestionProductos) parent;
         this.modoEditar = true;
@@ -61,13 +62,13 @@ public class NewJDialog extends javax.swing.JDialog {
         
         setUndecorated(true);
         initComponents();
-        setSize(500,500);
+        setSize(480,560);
         setLocationRelativeTo(parent);
         setLocation(getX() + 60, getY() + 30);
         setResizable(false);
         GuardarCombox();
         
-
+     
         jLabel1.setText("Editar Producto");
         jButton1.setText("Actualizar");
         btnCerrar.setText("Cancelar");
@@ -78,10 +79,19 @@ public class NewJDialog extends javax.swing.JDialog {
         txtPrecioC.setText(precioCompra);
         txtPrecioV.setText(precioVenta);
         txtCantidad.setText(String.valueOf(cantidad));
+        jComboUnidad.setModel(new javax.swing.DefaultComboBoxModel<>(
+       new String[] { "unidad", "metro", "kilogramo", "litro" }
+   ));
+
+       if (unidadMedida != null && !unidadMedida.isEmpty()) {
+            jComboUnidad.setSelectedItem(unidadMedida);
+    
+        }
 
         seleccionarCategoria(idCategoria);
+     
+ 
     }
-    
     
     private void seleccionarCategoria(int idCategoria) {
         for (int i = 0; i < jComboBox1.getItemCount(); i++) {
@@ -121,6 +131,8 @@ public class NewJDialog extends javax.swing.JDialog {
         jSeparator4 = new javax.swing.JSeparator();
         jSeparator5 = new javax.swing.JSeparator();
         jSeparator6 = new javax.swing.JSeparator();
+        jLabel9 = new javax.swing.JLabel();
+        jComboUnidad = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -148,7 +160,7 @@ public class NewJDialog extends javax.swing.JDialog {
                 btnCerrarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnCerrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 440, 90, 40));
+        jPanel1.add(btnCerrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 490, 90, 40));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel2.setText("Codigo de barras:");
@@ -231,7 +243,7 @@ public class NewJDialog extends javax.swing.JDialog {
                 jComboBox1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 260, 160, 50));
+        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 270, 160, 50));
 
         jButton1.setBackground(new java.awt.Color(0, 191, 255));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -243,7 +255,7 @@ public class NewJDialog extends javax.swing.JDialog {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 440, 90, 40));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 490, 90, 40));
         jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 500, 10));
         jPanel1.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 420, 180, 20));
         jPanel1.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, 180, 20));
@@ -251,15 +263,22 @@ public class NewJDialog extends javax.swing.JDialog {
         jPanel1.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 310, 180, 20));
         jPanel1.add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 420, 180, 20));
 
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel9.setText("Unidad de medida");
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 450, 170, 30));
+
+        jComboUnidad.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Unidad", "Metro", "Kilogramo", "Litros" }));
+        jPanel1.add(jComboUnidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 490, 160, 50));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 480, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 560, Short.MAX_VALUE)
         );
 
         pack();
@@ -338,7 +357,8 @@ public class NewJDialog extends javax.swing.JDialog {
             jComboBox1, 
             txtPrecioC, 
             txtPrecioV, 
-            txtCantidad
+            txtCantidad,
+            jComboUnidad
         );
         
         java.awt.Window window = SwingUtilities.getWindowAncestor(this);
@@ -354,7 +374,8 @@ public class NewJDialog extends javax.swing.JDialog {
             jComboBox1, 
             txtPrecioC, 
             txtPrecioV, 
-            txtCantidad
+            txtCantidad,
+            jComboUnidad
         );
     }
     
@@ -384,7 +405,7 @@ public class NewJDialog extends javax.swing.JDialog {
         public boolean ValidarNumeros(){
             try{
             
-              int cantidad = Integer.parseInt(txtCantidad.getText());
+              double cantidad =Double.parseDouble(txtCantidad.getText());
           
             
             if(cantidad <=0){
@@ -583,6 +604,7 @@ public class NewJDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnCerrar;
     private javax.swing.JButton jButton1;
     public javax.swing.JComboBox<itemCategoria> jComboBox1;
+    private javax.swing.JComboBox<String> jComboUnidad;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -590,6 +612,7 @@ public class NewJDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;

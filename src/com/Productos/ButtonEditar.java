@@ -44,43 +44,44 @@ public class ButtonEditar extends AbstractCellEditor implements TableCellEditor,
         fireEditingStopped();
         
         int filaVisita = table.getSelectedRow();
-        if(filaVisita == -1)return;
+        if(filaVisita == -1) return;
         
-        int filaModelo =  table.convertRowIndexToModel(filaVisita);
+        int filaModelo = table.convertRowIndexToModel(filaVisita);
         
-        String Producto = table.getModel().getValueAt(filaModelo,0).toString();
+        String Producto = table.getModel().getValueAt(filaModelo, 0).toString();
         
         if (accion.equals("editar")) {
            
             String nombre = table.getModel().getValueAt(filaModelo, 0).toString();
             String categoriaNombre = table.getModel().getValueAt(filaModelo, 1).toString();     
             String precioVenta = table.getModel().getValueAt(filaModelo, 2).toString();         
-            int cantidad = Integer.parseInt(table.getModel().getValueAt(filaModelo, 3).toString());
+            double cantidad = Double.parseDouble(table.getModel().getValueAt(filaModelo, 11).toString());
             
             int id = Integer.parseInt(table.getModel().getValueAt(filaModelo, 6).toString());           
             String codigoBarras = table.getModel().getValueAt(filaModelo, 7).toString();                
             int idCategoria = Integer.parseInt(table.getModel().getValueAt(filaModelo, 8).toString()); 
-            String precioCompra = table.getModel().getValueAt(filaModelo, 9).toString(); 
+            String precioCompra = table.getModel().getValueAt(filaModelo, 9).toString();
+            String unidadMedida = table.getModel().getValueAt(filaModelo, 10).toString();
             
             java.awt.Frame frame = (java.awt.Frame) SwingUtilities.getWindowAncestor(table);
             
             NewJDialog dialogo = new NewJDialog(
-            
-            frame,
-            true,
-             id, 
-             codigoBarras,
-             nombre, 
-             idCategoria, 
-             precioCompra, 
-             precioVenta, 
-             cantidad
+                frame,
+                true,
+                id, 
+                codigoBarras,
+                nombre, 
+                idCategoria, 
+                precioCompra, 
+                precioVenta, 
+                (int) cantidad,
+                unidadMedida
             );
             dialogo.setVisible(true);
          
         } else if (accion.equals("eliminar")) {
-            int id = Integer.parseInt(table.getModel().getValueAt(filaModelo,6).toString());
-            String nombre = table.getModel().getValueAt(filaModelo,0).toString();
+            int id = Integer.parseInt(table.getModel().getValueAt(filaModelo, 6).toString());
+            String nombre = table.getModel().getValueAt(filaModelo, 0).toString();
             
             int confirmacion = JOptionPane.showConfirmDialog(
                 null, 
@@ -90,19 +91,12 @@ public class ButtonEditar extends AbstractCellEditor implements TableCellEditor,
                 JOptionPane.WARNING_MESSAGE
             );
             
- 
-            
             if (confirmacion == JOptionPane.YES_OPTION) {
-
                 productoController.eliminarProducto(id);
                 
-              
                 java.awt.Frame frame = (java.awt.Frame) SwingUtilities.getWindowAncestor(table);
                 if (frame instanceof com.Productos.GestionProductos) {
                     ((com.Productos.GestionProductos) frame).MostrarProductos();
-                    
-                    
-                    
                 }
             }
         }

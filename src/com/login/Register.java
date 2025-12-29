@@ -82,7 +82,7 @@ public class Register extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(31, 31, 41));
         jLabel6.setText("¿Ya tienes una cuenta?");
-        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 610, -1, 20));
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 590, -1, 40));
 
         jButton1.setBackground(new java.awt.Color(164, 68, 219));
         jButton1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
@@ -95,7 +95,7 @@ public class Register extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 600, 140, 30));
+        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 590, 140, 40));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/Imagenes/angel.jpg"))); // NOI18N
         jLabel1.setPreferredSize(new java.awt.Dimension(575, 666));

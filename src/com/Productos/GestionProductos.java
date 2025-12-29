@@ -37,7 +37,7 @@ public class GestionProductos extends javax.swing.JFrame {
     public GestionProductos() {
        initComponents();
        setTitle("Gestion Productos");
-       setSize(1300,830);
+       setSize(1350,700);
        setLocationRelativeTo(null);
        setResizable(false);
        setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -238,9 +238,9 @@ public class GestionProductos extends javax.swing.JFrame {
                 lbl_iniMousePressed(evt);
             }
         });
-        Menu.add(lbl_ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
+        Menu.add(lbl_ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 160, 40));
+        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 170, 40));
 
         Menu1.setBackground(new java.awt.Color(0, 51, 255));
         Menu1.setForeground(new java.awt.Color(0, 153, 153));
@@ -264,9 +264,9 @@ public class GestionProductos extends javax.swing.JFrame {
                 lbl_ini1MousePressed(evt);
             }
         });
-        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
+        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 160, 40));
+        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 170, 40));
 
         Menu2.setBackground(new java.awt.Color(0, 51, 255));
         Menu2.setForeground(new java.awt.Color(0, 153, 153));
@@ -290,9 +290,9 @@ public class GestionProductos extends javax.swing.JFrame {
                 lbl_ini2MousePressed(evt);
             }
         });
-        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 160, 40));
+        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 170, 40));
 
         Menu3.setBackground(new java.awt.Color(0, 51, 255));
         Menu3.setForeground(new java.awt.Color(0, 153, 153));
@@ -316,9 +316,9 @@ public class GestionProductos extends javax.swing.JFrame {
                 lbl_ini3MousePressed(evt);
             }
         });
-        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 160, 40));
+        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 170, 40));
 
         Menu4.setBackground(new java.awt.Color(0, 51, 255));
         Menu4.setForeground(new java.awt.Color(0, 153, 153));
@@ -342,9 +342,9 @@ public class GestionProductos extends javax.swing.JFrame {
                 lbl_ini4MousePressed(evt);
             }
         });
-        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 160, 40));
+        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 170, 40));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 240, 830));
 
@@ -370,9 +370,9 @@ public class GestionProductos extends javax.swing.JFrame {
         tablaMuestraProducto.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(tablaMuestraProducto);
 
-        jPanel5.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 950, 580));
+        jPanel5.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 1010, 470));
 
-        jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 150, 1010, 640));
+        jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 150, 1060, 520));
 
         jButton1.setBackground(new java.awt.Color(0, 191, 255));
         jButton1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -384,7 +384,7 @@ public class GestionProductos extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1110, 60, 110, 50));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 80, 110, 50));
 
         txtBusquedaP.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         txtBusquedaP.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
@@ -411,15 +411,15 @@ public class GestionProductos extends javax.swing.JFrame {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/Imagenes/avatar (1).png"))); // NOI18N
         jLabel1.setText("jLabel1");
-        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 10, 30, -1));
+        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 30, -1));
 
         Saludo.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         Saludo.setForeground(new java.awt.Color(255, 255, 255));
         Saludo.setText("Dashboard");
         Saludo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, 150, 30));
+        jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 10, 150, 30));
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1060, 50));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1110, 50));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -429,7 +429,7 @@ public class GestionProductos extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
