@@ -676,7 +676,7 @@ private void navegarAValorInventario() {
         });
         Menu.add(lbl_ini, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
 
-        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 160, 40));
+        jPanel2.add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 170, 40));
 
         Menu1.setBackground(new java.awt.Color(0, 51, 255));
         Menu1.setForeground(new java.awt.Color(0, 153, 153));
@@ -700,9 +700,9 @@ private void navegarAValorInventario() {
                 lbl_ini1MousePressed(evt);
             }
         });
-        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 140, 32));
+        Menu1.add(lbl_ini1, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 160, 40));
+        jPanel2.add(Menu1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 170, 40));
 
         Menu2.setBackground(new java.awt.Color(0, 51, 255));
         Menu2.setForeground(new java.awt.Color(0, 153, 153));
@@ -726,9 +726,9 @@ private void navegarAValorInventario() {
                 lbl_ini2MousePressed(evt);
             }
         });
-        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu2.add(lbl_ini2, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 150, 32));
 
-        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 160, 40));
+        jPanel2.add(Menu2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 170, 40));
 
         Menu3.setBackground(new java.awt.Color(0, 51, 255));
         Menu3.setForeground(new java.awt.Color(0, 153, 153));
@@ -752,9 +752,9 @@ private void navegarAValorInventario() {
                 lbl_ini3MousePressed(evt);
             }
         });
-        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu3.add(lbl_ini3, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 160, 40));
+        jPanel2.add(Menu3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 170, 40));
 
         Menu4.setBackground(new java.awt.Color(0, 51, 255));
         Menu4.setForeground(new java.awt.Color(0, 153, 153));
@@ -778,9 +778,9 @@ private void navegarAValorInventario() {
                 lbl_ini4MousePressed(evt);
             }
         });
-        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 120, 32));
+        Menu4.add(lbl_ini4, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 5, 160, 32));
 
-        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 160, 40));
+        jPanel2.add(Menu4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 530, 170, 40));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 240, 830));
 

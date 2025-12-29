@@ -6,7 +6,7 @@ import java.io.File;
 
 public class Conexion {
     
-    private static final String NOMBRE_BD = "punto_venta_dev.db";
+    private static final String NOMBRE_BD = "punto_venta_dev_final.db";
     private static String rutaBD = null;
     private static Connection conexionActiva = null; // ✅ Mantener referencia
     
