@@ -12,10 +12,13 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Aleci/OneDrive/Documentos/NetBeansProjects/PuntoArcangelMiguel/src/com/bd/Conexion.java</file>
+            <file>file:/C:/Users/Aleci/OneDrive/Documentos/NetBeansProjects/PuntoArcangelMiguel/src/com/Dashboard/Dashboard.java</file>
             <file>file:/C:/Users/Aleci/OneDrive/Documentos/NetBeansProjects/PuntoArcangelMiguel/src/com/Inventario/ValordeInventario.java</file>
-            <file>file:/C:/Users/Aleci/OneDrive/Documentos/NetBeansProjects/PuntoArcangelMiguel/src/com/Inventario/Inventario.java</file>
+            <file>file:/C:/Users/Aleci/OneDrive/Documentos/NetBeansProjects/PuntoArcangelMiguel/src/com/Inventario/ReporteServicios.java</file>
             <file>file:/C:/Users/Aleci/OneDrive/Documentos/NetBeansProjects/PuntoArcangelMiguel/src/com/bd/Tablas.java</file>
+            <file>file:/C:/Users/Aleci/OneDrive/Documentos/NetBeansProjects/PuntoArcangelMiguel/src/com/Ventas/nuevaVenta.java</file>
+            <file>file:/C:/Users/Aleci/OneDrive/Documentos/NetBeansProjects/PuntoArcangelMiguel/src/com/Ventas/addVentas.java</file>
+            <file>file:/C:/Users/Aleci/OneDrive/Documentos/NetBeansProjects/PuntoArcangelMiguel/src/com/Productos/NewJDialog.java</file>
         </group>
     </open-files>
 </project-private>

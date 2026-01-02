@@ -95,37 +95,46 @@ public class nuevaVenta extends javax.swing.JFrame {
 }
     
     
-    private void configurarTabla() {
-        String[] columnas = {"Producto", "Cantidad", "Precio", "Operaciones"};
-        modeloTabla = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return column == 1 || column == 3; 
-            }
-        };
-        
-        TablaCompra.setModel(modeloTabla);
-        
-        // ⭐ CORREGIDO - Índices correctos (0, 1, 2, 3)
-        TablaCompra.getColumnModel().getColumn(1).setCellRenderer(new CantidadRenderer());
-        TablaCompra.getColumnModel().getColumn(1).setCellEditor(new CantidadEditor(this));
-        
-        TablaCompra.getColumnModel().getColumn(3).setCellRenderer(
-            new EliminarRenderer("/com/Imagenes/eliminar.png"));
-        TablaCompra.getColumnModel().getColumn(3).setCellEditor(
-            new EliminarEditor(new javax.swing.JCheckBox(), this));
-        
-        // ⭐ CORREGIDO - Solo 4 columnas (0, 1, 2, 3)
-        TablaCompra.getColumnModel().getColumn(0).setPreferredWidth(200); // Producto
-        TablaCompra.getColumnModel().getColumn(1).setPreferredWidth(120); // Cantidad
-        TablaCompra.getColumnModel().getColumn(2).setPreferredWidth(80);  // Precio
-        TablaCompra.getColumnModel().getColumn(3).setPreferredWidth(80);  // Operaciones
-        
-        TablaCompra.setRowHeight(35);
-        
-        txtTotalPagar.setText("$0.00");
-        txtCambio.setText("$0.00");
-    }
+   private void configurarTabla() {
+    String[] columnas = {"Producto", "Cantidad", "Precio", "Operaciones"};
+    modeloTabla = new DefaultTableModel(columnas, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return column == 1 || column == 3; 
+        }
+    };
+    
+    TablaCompra.setModel(modeloTabla);
+    
+    // ⭐ CRÍTICO: Deshabilitar el reordenamiento de columnas
+    TablaCompra.getTableHeader().setReorderingAllowed(false);
+    
+    // Configurar renderers y editores
+    TablaCompra.getColumnModel().getColumn(1).setCellRenderer(new CantidadRenderer());
+    TablaCompra.getColumnModel().getColumn(1).setCellEditor(new CantidadEditor(this));
+    
+    TablaCompra.getColumnModel().getColumn(3).setCellRenderer(
+        new EliminarRenderer("/com/Imagenes/eliminar.png"));
+    TablaCompra.getColumnModel().getColumn(3).setCellEditor(
+        new EliminarEditor(new javax.swing.JCheckBox(), this));
+    
+    // Configurar anchos de columna
+    TablaCompra.getColumnModel().getColumn(0).setPreferredWidth(200); // Producto
+    TablaCompra.getColumnModel().getColumn(1).setPreferredWidth(120); // Cantidad
+    TablaCompra.getColumnModel().getColumn(2).setPreferredWidth(80);  // Precio
+    TablaCompra.getColumnModel().getColumn(3).setPreferredWidth(80);  // Operaciones
+    
+    // ⭐ OPCIONAL: También puedes hacer las columnas NO redimensionables
+    TablaCompra.getColumnModel().getColumn(0).setResizable(false);
+    TablaCompra.getColumnModel().getColumn(1).setResizable(false);
+    TablaCompra.getColumnModel().getColumn(2).setResizable(false);
+    TablaCompra.getColumnModel().getColumn(3).setResizable(false);
+    
+    TablaCompra.setRowHeight(35);
+    
+    txtTotalPagar.setText("$0.00");
+    txtCambio.setText("$0.00");
+} 
     
     
     private void configurarEventos() {
@@ -149,8 +158,8 @@ public class nuevaVenta extends javax.swing.JFrame {
         });
     }
      
-   private void buscarProducto() {
-      String busqueda = jTextField2.getText().trim().toLowerCase();
+  private void buscarProducto() {
+    String busqueda = jTextField2.getText().trim().toLowerCase();
     
     Conexion conexion = new Conexion();
     
@@ -184,10 +193,13 @@ public class nuevaVenta extends javax.swing.JFrame {
                 // Verificar si ya está en la tabla
                 boolean encontrado = false;
                 double cantidadActual = 0;
+                
                 for (int i = 0; i < modeloTabla.getRowCount(); i++) {
                     if (modeloTabla.getValueAt(i, 0).equals(nombre)) {
                         encontrado = true;
-                        cantidadActual = Integer.parseInt(modeloTabla.getValueAt(i,1).toString());
+                        // ⭐ CORRECCIÓN: Usar Double.parseDouble en lugar de Integer.parseInt
+                        Object cantidadObj = modeloTabla.getValueAt(i, 1);
+                        cantidadActual = Double.parseDouble(cantidadObj.toString());
                         break;
                     }
                 }
@@ -205,10 +217,50 @@ public class nuevaVenta extends javax.swing.JFrame {
             }
         }
         
+        // Buscar servicios
+        String sqlServicios = "SELECT nombreServicio, precioVenta " +
+                             "FROM Servicios WHERE LOWER(nombreServicio) LIKE ?";
+        PreparedStatement psServicios = conexion.conectar().prepareStatement(sqlServicios);
+        psServicios.setString(1, "%" + busqueda + "%");
+        
+        ResultSet rsServicios = psServicios.executeQuery();
+        
+        while (rsServicios.next()) {
+            String nombreServicio = rsServicios.getString("nombreServicio");
+            BigDecimal precioVenta = rsServicios.getBigDecimal("precioVenta");
+            
+            productosEncontrados.add(nombreServicio);
+            
+            // Los servicios siempre están "disponibles" (stock infinito)
+            boolean encontrado = false;
+            for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+                if (modeloTabla.getValueAt(i, 0).equals(nombreServicio)) {
+                    encontrado = true;
+                    break;
+                }
+            }
+            
+            if (!encontrado) {
+                Object[] fila = {
+                    nombreServicio,
+                    0,
+                    precioVenta.setScale(2, BigDecimal.ROUND_HALF_UP),
+                    "Eliminar"
+                };
+                modeloTabla.addRow(fila);
+            }
+        }
+        
+        rsServicios.close();
+        psServicios.close();
+        
         // Eliminar productos que NO coinciden con la búsqueda y tienen cantidad 0
         for (int i = modeloTabla.getRowCount() - 1; i >= 0; i--) {
             String nombreEnTabla = modeloTabla.getValueAt(i, 0).toString();
-            double cantidad = Double.parseDouble(modeloTabla.getValueAt(i, 1).toString());
+            
+            // ⭐ CORRECCIÓN: Usar Double.parseDouble
+            Object cantidadObj = modeloTabla.getValueAt(i, 1);
+            double cantidad = Double.parseDouble(cantidadObj.toString());
             
             // Si el producto no está en los encontrados Y tiene cantidad 0, eliminarlo
             if (!productosEncontrados.contains(nombreEnTabla) && cantidad == 0) {
@@ -221,19 +273,33 @@ public class nuevaVenta extends javax.swing.JFrame {
         
     } catch (SQLException e) {
         logger.log(java.util.logging.Level.SEVERE, "Error al buscar producto", e);
+        JOptionPane.showMessageDialog(this,
+            "Error al buscar producto: " + e.getMessage(),
+            "Error de Base de Datos",
+            JOptionPane.ERROR_MESSAGE);
+    } catch (NumberFormatException e) {
+        logger.log(java.util.logging.Level.SEVERE, "Error al convertir cantidad", e);
+        JOptionPane.showMessageDialog(this,
+            "Error al procesar cantidades",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
     }
-    }
+}
    
    
    
    private void limpiarProductosSinCantidad() {
     for (int i = modeloTabla.getRowCount() - 1; i >= 0; i--) {
-        double cantidad = Double.parseDouble(modeloTabla.getValueAt(i, 1).toString());
+        // ⭐ CORRECCIÓN: Usar Double.parseDouble
+        Object cantidadObj = modeloTabla.getValueAt(i, 1);
+        double cantidad = Double.parseDouble(cantidadObj.toString());
+        
         if (cantidad == 0) {
             modeloTabla.removeRow(i);
         }
-    }
 }
+    
+   }
      
      public void calcularTotal() {
         totalPagar = BigDecimal.ZERO;
@@ -276,18 +342,33 @@ public class nuevaVenta extends javax.swing.JFrame {
     }
        
     private void limpiarVenta() {
-    if (TablaCompra.isEditing()) {
-        TablaCompra.getCellEditor().stopCellEditing();
+ if (TablaCompra.isEditing()) {
+        try {
+            javax.swing.table.TableCellEditor editor = TablaCompra.getCellEditor();
+            if (editor != null) {
+                editor.cancelCellEditing(); // Usar cancelar en lugar de stop
+            }
+        } catch (Exception e) {
+            // Si falla, ignorar - la tabla se limpiará de todos modos
+            logger.log(java.util.logging.Level.WARNING, "No se pudo cancelar edición", e);
+        }
     }
     
     // ⭐ Limpiar el campo de búsqueda PRIMERO
     jTextField2.setText("");
     
-    // ⭐ Luego limpiar la tabla
-    modeloTabla.setRowCount(0);
-    TablaCompra.clearSelection();
-    TablaCompra.revalidate();
-    TablaCompra.repaint();
+    // ⭐ Pequeña pausa para asegurar que no hay operaciones pendientes
+    try {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            modeloTabla.setRowCount(0);
+            TablaCompra.clearSelection();
+            TablaCompra.revalidate();
+            TablaCompra.repaint();
+        });
+    } catch (Exception e) {
+        // Fallback si falla el invokeLater
+        modeloTabla.setRowCount(0);
+    }
     
     totalPagar = BigDecimal.ZERO;
     txtTotalPagar.setText("$0.00");
@@ -295,7 +376,9 @@ public class nuevaVenta extends javax.swing.JFrame {
     JTextEfectivo.setText("");
     
     // ⭐ Dar foco al campo de búsqueda
-    jTextField2.requestFocus();
+    javax.swing.SwingUtilities.invokeLater(() -> {
+        jTextField2.requestFocus();
+    });
     }
       
      
@@ -513,149 +596,250 @@ public class nuevaVenta extends javax.swing.JFrame {
         
     }
     
-     private void guardarVentaEnBD(BigDecimal efectivo, BigDecimal cambio, boolean imprimirTicket) {
-        try {
-            if (TablaCompra.isEditing()) {
+   private void guardarVentaEnBD(BigDecimal efectivo, BigDecimal cambio, boolean imprimirTicket) {
+    try {
+        // ⭐ CORRECCIÓN: Detener edición de forma segura
+        if (TablaCompra.isEditing()) {
+            try {
                 TablaCompra.getCellEditor().stopCellEditing();
+            } catch (Exception ex) {
+                // Si falla al detener, intentar cancelar
+                TablaCompra.getCellEditor().cancelCellEditing();
+            }
+        }
+        
+        // ⭐ Pequeña pausa para asegurar que la tabla termine de actualizar
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+        
+        java.util.List<itemVentas> productos = new java.util.ArrayList<>();
+        Conexion conexion = new Conexion();
+        
+        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+            String nombreProducto = modeloTabla.getValueAt(i, 0).toString();
+            double cantidad = Double.parseDouble(modeloTabla.getValueAt(i, 1).toString());
+            
+            if (cantidad <= 0) {
+                continue;
             }
             
-            java.util.List<itemVentas> productos = new java.util.ArrayList<>();
-            Conexion conexion = new Conexion();
+            Object precioObj = modeloTabla.getValueAt(i, 2);
+            BigDecimal precio = (precioObj instanceof BigDecimal) ? 
+                (BigDecimal) precioObj : new BigDecimal(precioObj.toString());
             
-            for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-                String nombreProducto = modeloTabla.getValueAt(i, 0).toString();
-                double cantidad = Double.parseDouble(modeloTabla.getValueAt(i, 1).toString());
+            BigDecimal subtotal = precio.multiply(new BigDecimal(cantidad));
+            
+            // ✅ PRIMERO: Buscar en Productos
+            String sqlProducto = "SELECT id, cantidad as stock FROM Productos WHERE nombreProducto = ?";
+            PreparedStatement psProducto = conexion.conectar().prepareStatement(sqlProducto);
+            psProducto.setString(1, nombreProducto);
+            ResultSet rsProducto = psProducto.executeQuery();
+            
+            if (rsProducto.next()) {
+                // Es un producto
+                int idProducto = rsProducto.getInt("id");
+                double stockActual = rsProducto.getDouble("stock");
                 
-                if (cantidad <= 0) {
-                    continue;
+                // Validar stock
+                if (cantidad > stockActual) {
+                    rsProducto.close();
+                    psProducto.close();
+                    JOptionPane.showMessageDialog(this,
+                        String.format("Stock insuficiente para '%s'\nDisponible: %.1f\nSolicitado: %.1f",
+                            nombreProducto, stockActual, cantidad),
+                        "Stock Insuficiente",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
                 }
                 
-                Object precioObj = modeloTabla.getValueAt(i, 2);
-                BigDecimal precio = (precioObj instanceof BigDecimal) ? 
-                    (BigDecimal) precioObj : new BigDecimal(precioObj.toString());
+                itemVentas item = new itemVentas(
+                    idProducto, 
+                    nombreProducto, 
+                    cantidad, 
+                    precio,
+                    subtotal
+                );
+                productos.add(item);
                 
-                BigDecimal subtotal = precio.multiply(new BigDecimal(cantidad));
+                rsProducto.close();
+                psProducto.close();
                 
-                String sql = "SELECT id FROM Productos WHERE nombreProducto = ?";
-                PreparedStatement ps = conexion.conectar().prepareStatement(sql);
-                ps.setString(1, nombreProducto);
-                ResultSet rs = ps.executeQuery();
+            } else {
+                // No es producto, buscar en Servicios
+                rsProducto.close();
+                psProducto.close();
                 
-                if (rs.next()) {
-                    int idProducto = rs.getInt("id");
+                String sqlServicio = "SELECT id, idProductoConsumo, cantidadConsumo FROM Servicios WHERE nombreServicio = ?";
+                PreparedStatement psServicio = conexion.conectar().prepareStatement(sqlServicio);
+                psServicio.setString(1, nombreProducto);
+                ResultSet rsServicio = psServicio.executeQuery();
+                
+                if (rsServicio.next()) {
+                    int idServicio = rsServicio.getInt("id");
+                    Integer idProductoConsumo = rsServicio.getObject("idProductoConsumo") != null ? 
+                        rsServicio.getInt("idProductoConsumo") : null;
+                    Double cantidadConsumo = rsServicio.getObject("cantidadConsumo") != null ? 
+                        rsServicio.getDouble("cantidadConsumo") : null;
                     
+                    // ✅ Si el servicio consume un producto, validar stock
+                    if (idProductoConsumo != null && cantidadConsumo != null) {
+                        String sqlStockProducto = "SELECT nombreProducto, cantidad FROM Productos WHERE id = ?";
+                        PreparedStatement psStock = conexion.conectar().prepareStatement(sqlStockProducto);
+                        psStock.setInt(1, idProductoConsumo);
+                        ResultSet rsStock = psStock.executeQuery();
+                        
+                        if (rsStock.next()) {
+                            String nombreProductoConsumido = rsStock.getString("nombreProducto");
+                            double stockDisponible = rsStock.getDouble("cantidad");
+                            double cantidadNecesaria = cantidadConsumo * cantidad;
+                            
+                            if (cantidadNecesaria > stockDisponible) {
+                                rsStock.close();
+                                psStock.close();
+                                rsServicio.close();
+                                psServicio.close();
+                                
+                                JOptionPane.showMessageDialog(this,
+                                    String.format("El servicio '%s' requiere %.1f unidades de '%s'\n" +
+                                                "Stock disponible: %.1f\n" +
+                                                "Cantidad necesaria: %.1f",
+                                        nombreProducto, cantidadConsumo, nombreProductoConsumido,
+                                        stockDisponible, cantidadNecesaria),
+                                    "Stock Insuficiente",
+                                    JOptionPane.WARNING_MESSAGE);
+                                return;
+                            }
+                        }
+                        rsStock.close();
+                        psStock.close();
+                    }
+                    
+                    // Usar ID negativo para servicios (para diferenciarlo en DetalleVentas)
                     itemVentas item = new itemVentas(
-                        idProducto, 
+                        -idServicio,  // ✅ ID negativo indica servicio
                         nombreProducto, 
                         cantidad, 
                         precio,
                         subtotal
                     );
                     productos.add(item);
-                }
-                
-                rs.close();
-                ps.close();
-            }
-            
-            if (productos.isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                    "Debe agregar cantidad a los productos",
-                    "Advertencia",
-                    JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            
-            addVentas ventaController = new addVentas();
-            int idVenta = ventaController.guardarVenta(
-                Login.SesionUsuario.id, 
-                productos,
-                totalPagar,
-                efectivo,
-                cambio
-            );
-            
-            if (idVenta > 0) {
-                BigDecimal totalFinal = totalPagar;
-                BigDecimal efectivoFinal = efectivo;
-                BigDecimal cambioFinal = cambio;
-                java.util.List<itemVentas> productosVendidos = new java.util.ArrayList<>(productos);
-                
-                String nombreCajero = (Login.SesionUsuario.NombreUsuario != null) ? 
-                    Login.SesionUsuario.NombreUsuario : "Cajero";
-                
-                limpiarVenta();
-                actualizarInventarioEnOtrasVentanas();
-                Navegation.actualizarInventario();
-                
-                // ⭐ ACTUALIZAR VENTANA DE VENTAS EN TIEMPO REAL
-                if (Navegation.Ventas != null && Navegation.Ventas.isDisplayable()) {
-                    java.awt.EventQueue.invokeLater(() -> {
-                        try {
-                            // Recargar el historial de ventas
-                            Navegation.Ventas.dispose();
-                            Navegation.Ventas = new Ventas();
-                        } catch (Exception ex) {
-                            logger.log(java.util.logging.Level.WARNING, "Error actualizando Ventas", ex);
-                        }
-                    });
-                }
-                
-                if (imprimirTicket) {
-                    boolean impreso = impresoraTermica.imprimirTicket(
-                        idVenta, 
-                        productosVendidos,
-                        totalFinal,
-                        efectivoFinal,
-                        cambioFinal,
-                        nombreCajero
-                    );
                     
-                    if (impreso) {
-                        JOptionPane.showMessageDialog(this,
-                            String.format(
-                                "✓ Venta #%d realizada correctamente\n" +
-                                "✓ Ticket impreso en impresora térmica",
-                                idVenta
-                            ),
-                            "Venta Exitosa",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        int verEnPantalla = JOptionPane.showConfirmDialog(this,
-                            String.format(
-                                "✓ Venta #%d guardada exitosamente\n\n" +
-                                "⚠ NO SE PUDO IMPRIMIR el ticket\n" +
-                                "La impresora no está conectada o no responde\n\n" +
-                                "¿Desea ver el ticket en pantalla?",
-                                idVenta
-                            ),
-                            "Impresora No Disponible",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE);
-                        
-                        if (verEnPantalla == JOptionPane.YES_OPTION) {
-                            mostrarTicket(idVenta, productosVendidos, totalFinal, efectivoFinal, cambioFinal);
-                        }
-                    }
+                    rsServicio.close();
+                    psServicio.close();
                 } else {
+                    rsServicio.close();
+                    psServicio.close();
+                    
+                    JOptionPane.showMessageDialog(this,
+                        "No se encontró el producto/servicio: " + nombreProducto,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+        }
+        
+        if (productos.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Debe agregar cantidad a los productos",
+                "Advertencia",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Guardar la venta
+        addVentas ventaController = new addVentas();
+        int idVenta = ventaController.guardarVenta(
+            Login.SesionUsuario.id, 
+            productos,
+            totalPagar,
+            efectivo,
+            cambio
+        );
+        
+        if (idVenta > 0) {
+            BigDecimal totalFinal = totalPagar;
+            BigDecimal efectivoFinal = efectivo;
+            BigDecimal cambioFinal = cambio;
+            java.util.List<itemVentas> productosVendidos = new java.util.ArrayList<>(productos);
+            
+            String nombreCajero = (Login.SesionUsuario.NombreUsuario != null) ? 
+                Login.SesionUsuario.NombreUsuario : "Cajero";
+            
+            limpiarVenta();
+            actualizarInventarioEnOtrasVentanas();
+            Navegation.actualizarInventario();
+            
+            // Actualizar ventana de ventas
+            if (Navegation.Ventas != null && Navegation.Ventas.isDisplayable()) {
+                java.awt.EventQueue.invokeLater(() -> {
+                    try {
+                        Navegation.Ventas.dispose();
+                        Navegation.Ventas = new Ventas();
+                    } catch (Exception ex) {
+                        logger.log(java.util.logging.Level.WARNING, "Error actualizando Ventas", ex);
+                    }
+                });
+            }
+            
+            if (imprimirTicket) {
+                boolean impreso = impresoraTermica.imprimirTicket(
+                    idVenta, 
+                    productosVendidos,
+                    totalFinal,
+                    efectivoFinal,
+                    cambioFinal,
+                    nombreCajero
+                );
+                
+                if (impreso) {
                     JOptionPane.showMessageDialog(this,
                         String.format(
                             "✓ Venta #%d realizada correctamente\n" +
-                            "(Sin ticket impreso)",
+                            "✓ Ticket impreso en impresora térmica",
                             idVenta
                         ),
                         "Venta Exitosa",
                         JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    int verEnPantalla = JOptionPane.showConfirmDialog(this,
+                        String.format(
+                            "✓ Venta #%d guardada exitosamente\n\n" +
+                            "⚠ NO SE PUDO IMPRIMIR el ticket\n" +
+                            "La impresora no está conectada o no responde\n\n" +
+                            "¿Desea ver el ticket en pantalla?",
+                            idVenta
+                        ),
+                        "Impresora No Disponible",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                    
+                    if (verEnPantalla == JOptionPane.YES_OPTION) {
+                        mostrarTicket(idVenta, productosVendidos, totalFinal, efectivoFinal, cambioFinal);
+                    }
                 }
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    String.format(
+                        "✓ Venta #%d realizada correctamente\n" +
+                        "(Sin ticket impreso)",
+                        idVenta
+                    ),
+                    "Venta Exitosa",
+                    JOptionPane.INFORMATION_MESSAGE);
             }
-        } catch (Exception e) {
-            logger.log(java.util.logging.Level.SEVERE, "Error al guardar venta", e);
-            JOptionPane.showMessageDialog(this,
-                "Error al procesar la venta:\n" + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
         }
+    } catch (Exception e) {
+        logger.log(java.util.logging.Level.SEVERE, "Error al guardar venta", e);
+        JOptionPane.showMessageDialog(this,
+            "Error al procesar la venta:\n" + e.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
     }
+}
     
     
     public Icon getIcon( String ruta, int width, int height){

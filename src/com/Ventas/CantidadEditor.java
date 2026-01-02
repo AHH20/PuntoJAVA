@@ -71,34 +71,62 @@ public class CantidadEditor extends AbstractCellEditor implements TableCellEdito
     }
     
     private void obtenerUnidadMedida(String nombreProducto) {
-        try {
-            Conexion conexion = new Conexion();
-            String sql = "SELECT unidadMedida FROM Productos WHERE nombreProducto = ?";
-            PreparedStatement ps = conexion.conectar().prepareStatement(sql);
-            ps.setString(1, nombreProducto);
-            ResultSet rs = ps.executeQuery();
+    try {
+        Conexion conexion = new Conexion();
+        
+        // ✅ PRIMERO: Buscar en Productos
+        String sql = "SELECT unidadMedida FROM Productos WHERE nombreProducto = ?";
+        PreparedStatement ps = conexion.conectar().prepareStatement(sql);
+        ps.setString(1, nombreProducto);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            // Es un producto
+            unidadMedida = rs.getString("unidadMedida");
+            if (unidadMedida == null) unidadMedida = "unidad";
             
-            if (rs.next()) {
-                unidadMedida = rs.getString("unidadMedida");
-                if (unidadMedida == null) unidadMedida = "unidad";
-                
-                // Definir incremento según unidad
-                if (unidadMedida.equalsIgnoreCase("metro") || 
-                    unidadMedida.equalsIgnoreCase("kilogramo") || 
-                    unidadMedida.equalsIgnoreCase("litro")) {
-                    incremento = 0.5;
-                } else {
-                    incremento = 1.0;
-                }
+            // Definir incremento según unidad
+            if (unidadMedida.equalsIgnoreCase("metro") || 
+                unidadMedida.equalsIgnoreCase("kilogramo") || 
+                unidadMedida.equalsIgnoreCase("litro")) {
+                incremento = 0.5;
+            } else {
+                incremento = 1.0;
             }
             
             rs.close();
             ps.close();
-        } catch (Exception e) {
+            return; // ✅ Salir si se encontró en Productos
+        }
+        
+        rs.close();
+        ps.close();
+        
+        // ✅ SEGUNDO: Si no está en Productos, buscar en Servicios
+        String sqlServicio = "SELECT id FROM Servicios WHERE nombreServicio = ?";
+        PreparedStatement psServicio = conexion.conectar().prepareStatement(sqlServicio);
+        psServicio.setString(1, nombreProducto);
+        ResultSet rsServicio = psServicio.executeQuery();
+        
+        if (rsServicio.next()) {
+            // ✅ Es un servicio → SIEMPRE incremento de 1 (enteros)
+            unidadMedida = "unidad";
+            incremento = 1.0;
+        } else {
+            // No se encontró en ninguna tabla
             unidadMedida = "unidad";
             incremento = 1.0;
         }
+        
+        rsServicio.close();
+        psServicio.close();
+        
+    } catch (Exception e) {
+        System.err.println("Error al obtener unidad de medida: " + e.getMessage());
+        unidadMedida = "unidad";
+        incremento = 1.0;
     }
+}
     
     @Override
     public Object getCellEditorValue() {

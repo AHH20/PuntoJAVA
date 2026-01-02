@@ -487,12 +487,14 @@ public class Dashboard extends javax.swing.JFrame {
 }
    
    
-  private void actualizarGananciasDelDia() {
+ private void actualizarGananciasDelDia() {
+    // ✅ CALCULAR GANANCIAS USANDO COSTOS HISTÓRICOS
     String sql = "SELECT " +
-                 "COALESCE(SUM(dv.subtotal), 0) as totalVentas, " +
-                 "COALESCE(SUM(dv.cantidad * p.precioDeCompra), 0) as totalCostos " +
+                 // Total de ingresos (productos + servicios)
+                 "COALESCE(SUM(dv.subtotal), 0) as totalIngresos, " +
+                 // Total de costos históricos (productos + insumos de servicios)
+                 "COALESCE(SUM(dv.costoInsumo), 0) as totalCostos " +
                  "FROM DetalleVentas dv " +
-                 "INNER JOIN Productos p ON dv.idProducto = p.id " +
                  "INNER JOIN Ventas v ON dv.idVenta = v.id " +
                  "WHERE date(v.fechaVenta) = date('now') " +
                  "AND v.estado = 'completada'";
@@ -502,13 +504,14 @@ public class Dashboard extends javax.swing.JFrame {
          ResultSet rs = sms.executeQuery(sql)) {
         
         if (rs.next()) {
-            BigDecimal totalVentas = rs.getBigDecimal("totalVentas");
+            BigDecimal totalIngresos = rs.getBigDecimal("totalIngresos");
             BigDecimal totalCostos = rs.getBigDecimal("totalCostos");
             
-            if (totalVentas == null) totalVentas = BigDecimal.ZERO;
+            if (totalIngresos == null) totalIngresos = BigDecimal.ZERO;
             if (totalCostos == null) totalCostos = BigDecimal.ZERO;
             
-            BigDecimal ganancia = totalVentas.subtract(totalCostos);
+            // ✅ GANANCIA = INGRESOS - COSTOS (incluye productos Y servicios)
+            BigDecimal ganancia = totalIngresos.subtract(totalCostos);
             
             JGanacias.setText("$" + ganancia.setScale(2, BigDecimal.ROUND_HALF_UP));
             
@@ -953,7 +956,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         JVentasDia.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         JVentasDia.setText("0");
-        jPanel6.add(JVentasDia, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, -1, -1));
+        jPanel6.add(JVentasDia, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 60, -1, -1));
 
         jPanel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 60, 210, 140));
 
@@ -1027,7 +1030,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         JStockBajo.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         JStockBajo.setText("0 Productos");
-        jPanel7.add(JStockBajo, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 60, -1, -1));
+        jPanel7.add(JStockBajo, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 60, -1, -1));
 
         jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 60, 230, 140));
 

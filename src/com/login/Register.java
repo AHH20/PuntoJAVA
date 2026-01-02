@@ -36,7 +36,7 @@ public class Register extends javax.swing.JFrame {
     public Register() {
         
         com.bd.Tablas.crear();
-        
+  
         initComponents();
         
        setTitle("Crear Cuenta");

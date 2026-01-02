@@ -175,7 +175,7 @@ public class NewJDialog extends javax.swing.JDialog {
         jLabel1.setText("Agregar Productos");
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 220, 30));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 500, 60));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 480, 60));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel3.setText("Precio de compra:");
@@ -471,8 +471,8 @@ public class NewJDialog extends javax.swing.JDialog {
               }
               
               
-             if(precio.scale()>2){
-                 JOptionPane.showMessageDialog(this, "el precio solo permite 2 decimales");
+             if(precio.scale()>4){
+                 JOptionPane.showMessageDialog(this, "el precio solo permite 4 decimales");
                  return false;
              }
                  

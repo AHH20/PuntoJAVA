@@ -3,7 +3,9 @@ import com.Dashboard.Dashboard;
 
 import com.Inventario.ValordeInventario;
 import com.Inventario.Inventario;
+import com.Inventario.ReporteServicios;
 import com.Productos.GestionProductos;
+import com.Productos.GestionServicios;
 import com.Ventas.Ventas;
 import com.Ventas.nuevaVenta;
 
@@ -12,10 +14,12 @@ import com.Ventas.nuevaVenta;
 public class Navegation {
     
     public static Dashboard Dashboard;
-    public static GestionProductos GestionProductos; // ⭐ ÚNICA variable
+    public static GestionProductos GestionProductos; 
+    public static GestionServicios GestionServicios;
     public static nuevaVenta nuevaVenta;
     public static Ventas Ventas;
     public static Inventario Inventario;
+    public static ReporteServicios ReporteServicios;
 
    public static ValordeInventario ValordeInventario;
     
@@ -190,6 +194,73 @@ public class Navegation {
     }
     
     
+    
+  public static void mostrarServicios() {
+        // Ocultar todas las ventanas
+        if (Dashboard != null && Dashboard.isVisible()) {
+            Dashboard.setVisible(false);
+        }
+        if (GestionProductos != null && GestionProductos.isVisible()) {
+            GestionProductos.setVisible(false);
+        }
+        if (nuevaVenta != null && nuevaVenta.isVisible()) {
+            nuevaVenta.setVisible(false);
+        }
+        if (Ventas != null && Ventas.isVisible()) {
+            Ventas.setVisible(false);
+        }
+        if (Inventario != null && Inventario.isVisible()) {
+            Inventario.setVisible(false);
+        }
+        if (ValordeInventario != null && ValordeInventario.isVisible()) {
+            ValordeInventario.setVisible(false);
+        }
+        
+        // Crear o mostrar GestionServicios
+        if (GestionServicios == null || !GestionServicios.isDisplayable()) {
+            GestionServicios = new GestionServicios();
+        } else {
+            // Si ya existe, actualizar los servicios
+            GestionServicios.mostrarServicios();
+        }
+        
+        GestionServicios.setVisible(true);
+        GestionServicios.toFront();
+    }
+  
+  public static void mostrarReporteServicios() {
+    // Ocultar todas las ventanas
+    if (Dashboard != null && Dashboard.isVisible()) {
+        Dashboard.setVisible(false);
+    }
+    if (GestionProductos != null && GestionProductos.isVisible()) {
+        GestionProductos.setVisible(false);
+    }
+    if (nuevaVenta != null && nuevaVenta.isVisible()) {
+        nuevaVenta.setVisible(false);
+    }
+    if (Ventas != null && Ventas.isVisible()) {
+        Ventas.setVisible(false);
+    }
+    if (Inventario != null && Inventario.isVisible()) {
+        Inventario.setVisible(false);
+    }
+    if (ValordeInventario != null && ValordeInventario.isVisible()) {
+        ValordeInventario.setVisible(false);
+    }
+    
+    // Crear o mostrar ReporteServicios
+    if (ReporteServicios == null || !ReporteServicios.isDisplayable()) {
+        ReporteServicios = new ReporteServicios();
+    }
+    
+    ReporteServicios.setVisible(true);
+    ReporteServicios.toFront();
+}
+    
+    
+    
+    
     public static void mostrarEntradasSalidas() {
     // Ocultar todas las ventanas
     if (Dashboard != null && Dashboard.isVisible()) {
@@ -220,12 +291,15 @@ public class Navegation {
     
     
     
-    public static void cerrarTodo() {
+   public static void cerrarTodo() {
         if (Dashboard != null && Dashboard.isDisplayable()) {
             Dashboard.dispose();
         }
         if (GestionProductos != null && GestionProductos.isDisplayable()) {
             GestionProductos.dispose();
+        }
+        if (GestionServicios != null && GestionServicios.isDisplayable()) { // ⭐ NUEVO
+            GestionServicios.dispose();
         }
         if (nuevaVenta != null && nuevaVenta.isDisplayable()) {
             nuevaVenta.dispose();
@@ -236,13 +310,20 @@ public class Navegation {
         if (Inventario != null && Inventario.isDisplayable()) {
             Inventario.dispose();
         }
-     
+        if (ValordeInventario != null && ValordeInventario.isDisplayable()) {
+            ValordeInventario.dispose();
+        }
+         if (ReporteServicios != null && ReporteServicios.isDisplayable()) { // ⭐ NUEVO
+        ReporteServicios.dispose();
+    }
         
         Dashboard = null;
         GestionProductos = null;
+        GestionServicios = null; // ⭐ NUEVO
         nuevaVenta = null;
         Ventas = null;
         Inventario = null;
-  
+        ValordeInventario = null;
+        ReporteServicios = null;
     }
 }

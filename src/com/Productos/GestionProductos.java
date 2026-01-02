@@ -48,8 +48,59 @@ public class GestionProductos extends javax.swing.JFrame {
        actualizarEstiloMenu();
        MostrarProductos();
        FiltrarBusquedas();
+       configurarEventosLabels() ;
         
     }
+    
+    private void configurarEventosLabels() {
+    // Configurar cursor para ambos labels
+    JGestionProductos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+    jGestionServicios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+    
+    // Evento click y hover en "Gestion Productos" (JGestionProductos)
+    JGestionProductos.addMouseListener(new java.awt.event.MouseAdapter() {
+        @Override
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            // Ya estamos en productos, recargar la tabla
+            MostrarProductos();
+        }
+        
+        @Override
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            // Cambiar color al pasar el mouse
+            JGestionProductos.setForeground(new java.awt.Color(0, 191, 255));
+        }
+        
+        @Override
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            // Restaurar color original
+            JGestionProductos.setForeground(new java.awt.Color(0, 0, 0));
+        }
+    });
+    
+    // Evento click y hover en "Gestion Servicios" (jGestionServicios)
+    jGestionServicios.addMouseListener(new java.awt.event.MouseAdapter() {
+        @Override
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            // Navegar a servicios
+            Navegation.mostrarServicios();
+            GestionProductos.this.setVisible(false);
+        }
+        
+        @Override
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            // Cambiar color al pasar el mouse
+            jGestionServicios.setForeground(new java.awt.Color(0, 191, 255));
+        }
+        
+        @Override
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            // Restaurar color original
+            jGestionServicios.setForeground(new java.awt.Color(0, 0, 0));
+        }
+    });
+}
+
     
     
     
@@ -155,8 +206,7 @@ public class GestionProductos extends javax.swing.JFrame {
                 
                 sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto, 0));
                 
-                jLabel4.setVisible(tablaMuestraProducto.getRowCount() == 0);
-                jLabel4.setText("No existe el producto");
+                
             }
         });
     }
@@ -199,6 +249,9 @@ public class GestionProductos extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         Saludo = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jGestionServicios = new javax.swing.JLabel();
+        JGestionProductos = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -349,7 +402,7 @@ public class GestionProductos extends javax.swing.JFrame {
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 240, 830));
 
         jPanel5.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Productos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 12), new java.awt.Color(0, 0, 0))); // NOI18N
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Productos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(0, 0, 0))); // NOI18N
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tablaMuestraProducto.setModel(new javax.swing.table.DefaultTableModel(
@@ -420,6 +473,20 @@ public class GestionProductos extends javax.swing.JFrame {
         jPanel3.add(Saludo, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 10, 150, 30));
 
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 0, 1110, 50));
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jGestionServicios.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        jGestionServicios.setText("Gestion Servicios");
+        jPanel4.add(jGestionServicios, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 10, 240, 50));
+
+        JGestionProductos.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        JGestionProductos.setText("Gestion Productos");
+        jPanel4.add(JGestionProductos, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, 220, 50));
+
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 70, 780, 70));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -574,6 +641,7 @@ public class GestionProductos extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel AngelMiguel;
+    private javax.swing.JLabel JGestionProductos;
     public static Components.PanelRound Menu;
     public static Components.PanelRound Menu1;
     public static Components.PanelRound Menu2;
@@ -582,6 +650,7 @@ public class GestionProductos extends javax.swing.JFrame {
     private javax.swing.JPopupMenu MenuUsuario;
     private javax.swing.JLabel Saludo;
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jGestionServicios;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -590,6 +659,7 @@ public class GestionProductos extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     public static javax.swing.JLabel lbl_ini;

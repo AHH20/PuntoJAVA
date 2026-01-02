@@ -70,16 +70,16 @@ public class ValordeInventario extends javax.swing.JFrame {
     }
     
     
-    private void configurarNavegacionLabels() {
+private void configurarNavegacionLabels() {
     JreporteGeneral.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-    JValorInventario.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-   
+    JReporteServicios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+    JValorInventario1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
     
     // Navegar a Inventario (Reporte General)
     JreporteGeneral.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mousePressed(java.awt.event.MouseEvent evt) {
             Navegation.mostrarInventario();
-            ValordeInventario.this.setVisible(false); // ✅ Ocultar ValordeInventario
+            ValordeInventario.this.setVisible(false);
         }
         public void mouseEntered(java.awt.event.MouseEvent evt) {
             JreporteGeneral.setForeground(new java.awt.Color(0, 191, 255));
@@ -89,19 +89,32 @@ public class ValordeInventario extends javax.swing.JFrame {
         }
     });
     
-    // Ya estamos en Valor de Inventario
-    JValorInventario.addMouseListener(new java.awt.event.MouseAdapter() {
+    // ⭐ NAVEGAR A REPORTE SERVICIOS
+    JReporteServicios.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mousePressed(java.awt.event.MouseEvent evt) {
-            System.out.println("Ya estás en Valor de Inventario"); // ✅ Ya está aquí
+            Navegation.mostrarReporteServicios();
+            ValordeInventario.this.setVisible(false);
         }
         public void mouseEntered(java.awt.event.MouseEvent evt) {
-            JValorInventario.setForeground(new java.awt.Color(0, 191, 255));
+            JReporteServicios.setForeground(new java.awt.Color(0, 191, 255));
         }
         public void mouseExited(java.awt.event.MouseEvent evt) {
-            JValorInventario.setForeground(new java.awt.Color(0, 0, 0));
+            JReporteServicios.setForeground(new java.awt.Color(0, 0, 0));
         }
     });
     
+    // YA ESTAMOS EN VALOR DE INVENTARIO
+    JValorInventario1.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mousePressed(java.awt.event.MouseEvent evt) {
+            System.out.println("Ya estás en Valor de Inventario");
+        }
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            JValorInventario1.setForeground(new java.awt.Color(0, 191, 255));
+        }
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            JValorInventario1.setForeground(new java.awt.Color(0, 0, 0));
+        }
+    });
 }
     
     
@@ -588,8 +601,9 @@ public void TamanoImagen(){
         Saludo = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         ButtonDescargar = new javax.swing.JButton();
-        JValorInventario = new javax.swing.JLabel();
+        JReporteServicios = new javax.swing.JLabel();
         JreporteGeneral = new javax.swing.JLabel();
+        JValorInventario1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -775,13 +789,17 @@ public void TamanoImagen(){
         ButtonDescargar.setBorder(null);
         jPanel4.add(ButtonDescargar, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 10, 110, 50));
 
-        JValorInventario.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
-        JValorInventario.setText("Valor de Inventario");
-        jPanel4.add(JValorInventario, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 20, 220, -1));
+        JReporteServicios.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        JReporteServicios.setText("Reporte Servicios");
+        jPanel4.add(JReporteServicios, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 20, 220, -1));
 
         JreporteGeneral.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         JreporteGeneral.setText("Reporte General");
         jPanel4.add(JreporteGeneral, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 20, 180, -1));
+
+        JValorInventario1.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        JValorInventario1.setText("Valor de Inventario");
+        jPanel4.add(JValorInventario1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 20, 220, -1));
 
         jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 1050, 70));
 
@@ -934,8 +952,9 @@ public void TamanoImagen(){
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel AngelMiguel;
     private javax.swing.JButton ButtonDescargar;
+    private javax.swing.JLabel JReporteServicios;
     private javax.swing.JTable JTableValor;
-    private javax.swing.JLabel JValorInventario;
+    private javax.swing.JLabel JValorInventario1;
     private javax.swing.JLabel JreporteGeneral;
     public static Components.PanelRound Menu;
     public static Components.PanelRound Menu1;
