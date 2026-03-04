@@ -132,7 +132,7 @@ public class Inventario extends javax.swing.JFrame {
     String sql = "SELECT " +
                 "p.nombreProducto, " +
                 "p.cantidad AS stockActual, " +
-                "p.unidadMedida, " +  // AGREGAR ESTA LÍNEA si tienes la columna
+                "p.unidadMedida, " +  
                 "COALESCE(SUM(dv.cantidad), 0) AS unidadesVendidas, " +
                 "p.precioVenta, " +
                 "(p.cantidad * p.precioVenta) AS valorTotal " +
@@ -154,22 +154,21 @@ public class Inventario extends javax.swing.JFrame {
         while (rs.next()) {
             String nombre = rs.getString("nombreProducto");
             double stockActual = rs.getDouble("stockActual");
-            String unidadMedida = rs.getString("unidadMedida"); // OBTENER UNIDAD
+            String unidadMedida = rs.getString("unidadMedida"); 
             double unidadesVendidas = rs.getDouble("unidadesVendidas");
             double precioVenta = rs.getDouble("precioVenta");
             double valorTotal = rs.getDouble("valorTotal");
             
             String nivelRotacion = calcularNivelRotacion((int)unidadesVendidas, (int)stockActual);
             
-            // Si no tiene unidad definida, usar "unidades" por defecto
             if (unidadMedida == null || unidadMedida.trim().isEmpty()) {
                 unidadMedida = "unidades";
             }
             
             Object[] fila = {
                 nombre,
-                df.format(stockActual) + " " + unidadMedida,  // CAMBIO AQUÍ
-                df.format(unidadesVendidas) + " " + unidadMedida,  // CAMBIO AQUÍ
+                df.format(stockActual) + " " + unidadMedida,  
+                df.format(unidadesVendidas) + " " + unidadMedida,  
                 "$" + df.format(valorTotal),
                 "$" + df.format(precioVenta),
                 nivelRotacion
@@ -186,10 +185,12 @@ public class Inventario extends javax.swing.JFrame {
         logger.log(java.util.logging.Level.SEVERE, "Error al cargar inventario", e);
     }
 }
+   
+   
     
     private String calcularNivelRotacion(int unidadesVendidas, int stockActual) {
         if (stockActual == 0) {
-            return "⚠️ Sin Stock";
+            return "Sin Stock";
         }
         
         double rotacion = (double) unidadesVendidas / (stockActual + unidadesVendidas);
@@ -206,7 +207,7 @@ public class Inventario extends javax.swing.JFrame {
     }
     
     private void iniciarActualizacionAutomatica() {
-        // Actualizar cada 5 segundos
+       
         actualizacionTimer = new Timer(5000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -257,12 +258,12 @@ public class Inventario extends javax.swing.JFrame {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Reporte de Inventario");
         
-        // Nombre sugerido con fecha y hora
+    
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HHmm");
         String nombreSugerido = "Inventario_" + sdf.format(new Date()) + ".pdf";
         fileChooser.setSelectedFile(new File(nombreSugerido));
         
-        // Filtro para solo archivos PDF
+      
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos PDF (*.pdf)", "pdf");
         fileChooser.setFileFilter(filter);
         
@@ -271,7 +272,7 @@ public class Inventario extends javax.swing.JFrame {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
             
-            // Asegurar que tenga extensión .pdf
+        
             if (!fileToSave.getName().toLowerCase().endsWith(".pdf")) {
                 fileToSave = new File(fileToSave.getAbsolutePath() + ".pdf");
             }
@@ -283,7 +284,7 @@ public class Inventario extends javax.swing.JFrame {
                     "Éxito",
                     JOptionPane.INFORMATION_MESSAGE);
                     
-                // Preguntar si desea abrir el archivo
+              
                 int respuesta = JOptionPane.showConfirmDialog(this,
                     "¿Desea abrir el archivo ahora?",
                     "Abrir archivo",
@@ -304,42 +305,40 @@ public class Inventario extends javax.swing.JFrame {
     }
     
     private void exportarAPDF(File archivo) throws Exception {
-        Document document = new Document(PageSize.A4.rotate()); // Horizontal para más espacio
+        Document document = new Document(PageSize.A4.rotate()); 
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(archivo));
         
         document.open();
         
-        // Fuentes
+     
         Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.DARK_GRAY);
         Font subtitleFont = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.GRAY);
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
         Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 9, BaseColor.BLACK);
         
-        // Título
+     
         Paragraph title = new Paragraph("REPORTE DE INVENTARIO", titleFont);
         title.setAlignment(Element.ALIGN_CENTER);
         title.setSpacingAfter(5);
         document.add(title);
         
-        // Subtítulo
         Paragraph subtitle = new Paragraph("ARCANGEL MIGUEL", titleFont);
         subtitle.setAlignment(Element.ALIGN_CENTER);
         subtitle.setSpacingAfter(10);
         document.add(subtitle);
         
-        // Fecha
+       
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Paragraph date = new Paragraph("Fecha de generación: " + sdf.format(new Date()), subtitleFont);
         date.setAlignment(Element.ALIGN_CENTER);
         date.setSpacingAfter(20);
         document.add(date);
         
-        // Crear tabla
         DefaultTableModel model = (DefaultTableModel) JTableReporte.getModel();
         PdfPTable table = new PdfPTable(model.getColumnCount());
         table.setWidthPercentage(100);
         
-        // Anchos de columnas proporcionales
+ 
         float[] columnWidths = {3f, 2f, 2.5f, 2f, 2f, 2.5f};
         table.setWidths(columnWidths);
         
@@ -353,20 +352,20 @@ public class Inventario extends javax.swing.JFrame {
             table.addCell(headerCell);
         }
         
-        // Datos con colores alternados
+       
         for (int i = 0; i < model.getRowCount(); i++) {
             for (int j = 0; j < model.getColumnCount(); j++) {
                 Object value = model.getValueAt(i, j);
                 PdfPCell dataCell = new PdfPCell(new Phrase(value != null ? value.toString() : "", dataFont));
                 
-                // Alternar colores de fila
+               
                 if (i % 2 == 0) {
                     dataCell.setBackgroundColor(new BaseColor(240, 248, 255)); // Azul muy claro
                 } else {
                     dataCell.setBackgroundColor(BaseColor.WHITE);
                 }
                 
-                // Alineación
+              
                 if (j == 0) {
                     dataCell.setHorizontalAlignment(Element.ALIGN_LEFT);
                 } else {
@@ -381,13 +380,13 @@ public class Inventario extends javax.swing.JFrame {
         
         document.add(table);
         
-        // Resumen
+      
         Paragraph summary = new Paragraph("\n\nTotal de productos en inventario: " + model.getRowCount(), 
                                          FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11));
         summary.setSpacingBefore(15);
         document.add(summary);
         
-        // Pie de página
+     
         Paragraph footer = new Paragraph("\n\nGenerado por Sistema de Inventario Arcangel Miguel", 
                                         FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 8, BaseColor.GRAY));
         footer.setAlignment(Element.ALIGN_CENTER);
@@ -410,7 +409,7 @@ public class Inventario extends javax.swing.JFrame {
     JReporteServicios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
     JValorInventario1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)); // ⭐ AGREGAR
 
-    // YA ESTAMOS EN REPORTE GENERAL
+ 
     JreporteGeneral.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mousePressed(java.awt.event.MouseEvent evt) {
             System.out.println("Ya estás en Reporte General");
@@ -425,7 +424,7 @@ public class Inventario extends javax.swing.JFrame {
         }
     });
     
-    // NAVEGAR A REPORTE SERVICIOS
+    
     JReporteServicios.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mousePressed(java.awt.event.MouseEvent evt) {
             Navegation.mostrarReporteServicios();
@@ -441,7 +440,7 @@ public class Inventario extends javax.swing.JFrame {
         }
     });
     
-    // ⭐ NAVEGAR A VALOR DE INVENTARIO
+
     JValorInventario1.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mousePressed(java.awt.event.MouseEvent evt) {
             Navegation.mostrarValorInventario();
@@ -531,7 +530,6 @@ private void navegarAValorInventario() {
     
     JTableReporte.setRowSorter(sorter);
     
-    // Comparador para Stock Actual (columna 1)
     sorter.setComparator(1, new java.util.Comparator<String>() {
         @Override
         public int compare(String o1, String o2) {
@@ -545,7 +543,7 @@ private void navegarAValorInventario() {
         }
     });
     
-    // Comparador para Unidades Vendidas (columna 2)
+ 
     sorter.setComparator(2, new java.util.Comparator<String>() {
         @Override
         public int compare(String o1, String o2) {
@@ -559,7 +557,7 @@ private void navegarAValorInventario() {
         }
     });
     
-    // Comparador para Valor Total (columna 3)
+
     sorter.setComparator(3, new java.util.Comparator<String>() {
         @Override
         public int compare(String o1, String o2) {
@@ -576,12 +574,12 @@ private void navegarAValorInventario() {
         }
     });
     
-    // Comparador para Precio Venta (columna 4)
+    
     sorter.setComparator(4, new java.util.Comparator<String>() {
         @Override
         public int compare(String o1, String o2) {
             try {
-                // Remover $, comas y espacios, dejar solo números y punto decimal
+             
                 String clean1 = o1.replaceAll("[$,\\s]", "");
                 String clean2 = o2.replaceAll("[$,\\s]", "");
                 double num1 = Double.parseDouble(clean1);
@@ -592,8 +590,7 @@ private void navegarAValorInventario() {
             }
         }
     });
-    
-    // Comparador para Nivel de Rotación (columna 5)
+  
     sorter.setComparator(5, new java.util.Comparator<String>() {
         @Override
         public int compare(String o1, String o2) {

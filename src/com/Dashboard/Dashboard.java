@@ -409,7 +409,7 @@ public class Dashboard extends javax.swing.JFrame {
    private void actualizarVentasDiarias(){
        String sql = "SELECT COALESCE(SUM(totalVenta), 0) as totalHoy " +
                  "FROM Ventas " +
-                 "WHERE date(fechaVenta) = date('now') " +
+                 "WHERE date(fechaVenta,'localtime') = date('now', 'localtime') " +
                  "AND estado = 'completada'";
        
        try(Connection db = Conexion.conectar();
@@ -488,15 +488,13 @@ public class Dashboard extends javax.swing.JFrame {
    
    
  private void actualizarGananciasDelDia() {
-    // ✅ CALCULAR GANANCIAS USANDO COSTOS HISTÓRICOS
+    
     String sql = "SELECT " +
-                 // Total de ingresos (productos + servicios)
                  "COALESCE(SUM(dv.subtotal), 0) as totalIngresos, " +
-                 // Total de costos históricos (productos + insumos de servicios)
                  "COALESCE(SUM(dv.costoInsumo), 0) as totalCostos " +
                  "FROM DetalleVentas dv " +
                  "INNER JOIN Ventas v ON dv.idVenta = v.id " +
-                 "WHERE date(v.fechaVenta) = date('now') " +
+                 "WHERE date(v.fechaVenta,'localtime') = date('now', 'localtime') " +
                  "AND v.estado = 'completada'";
     
     try (Connection db = Conexion.conectar();
@@ -510,12 +508,12 @@ public class Dashboard extends javax.swing.JFrame {
             if (totalIngresos == null) totalIngresos = BigDecimal.ZERO;
             if (totalCostos == null) totalCostos = BigDecimal.ZERO;
             
-            // ✅ GANANCIA = INGRESOS - COSTOS (incluye productos Y servicios)
+           
             BigDecimal ganancia = totalIngresos.subtract(totalCostos);
             
             JGanacias.setText("$" + ganancia.setScale(2, BigDecimal.ROUND_HALF_UP));
             
-            // Cambiar color según ganancia
+          
             if (ganancia.compareTo(BigDecimal.ZERO) > 0) {
                 JGanacias.setForeground(new Color(46, 204, 113)); // Verde
             } else {
@@ -592,14 +590,14 @@ public class Dashboard extends javax.swing.JFrame {
                         JOptionPane.QUESTION_MESSAGE);
                 
                 if (opcion == JOptionPane.CANCEL_OPTION) {
-                    return; // No cerrar sesión
+                    return; 
                 }
                 
                 if (opcion == JOptionPane.YES_OPTION) {
                     com.respaldo.Respaldo.crearRespaldo();
                 }
                 
-                // Cerrar sesión
+                
                 Login inicio = new Login();
                 inicio.setVisible(true);
                 Dashboard.this.dispose();
@@ -607,9 +605,8 @@ public class Dashboard extends javax.swing.JFrame {
         });
     }
     
-    /**
-     * Método mejorado para cargar íconos con manejo de errores
-     */
+   
+   
     public Icon getIcon(String ruta, int width, int height) {
         try {
             java.net.URL imgURL = getClass().getResource(ruta);
@@ -675,7 +672,7 @@ public class Dashboard extends javax.swing.JFrame {
                 return;
             }
             
-            // Buscar el respaldo más reciente
+          
             long ultimoRespaldo = 0;
             for (File archivo : archivos) {
                 if (archivo.lastModified() > ultimoRespaldo) {

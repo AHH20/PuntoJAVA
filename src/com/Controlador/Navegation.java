@@ -257,6 +257,7 @@ public class Navegation {
     ReporteServicios.setVisible(true);
     ReporteServicios.toFront();
 }
+  
     
     
     
@@ -286,9 +287,6 @@ public class Navegation {
     
 
 }
-    
-    
-    
     
     
    public static void cerrarTodo() {

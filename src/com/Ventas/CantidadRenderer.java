@@ -42,7 +42,7 @@ public class CantidadRenderer extends JPanel implements TableCellRenderer {
         if (value != null) {
             if (value instanceof Double) {
                 double cantidad = (Double) value;
-                // Si es entero, mostrar sin decimales
+              
                 if (cantidad == Math.floor(cantidad)) {
                     lblCantidad.setText(String.valueOf((int)cantidad));
                 } else {

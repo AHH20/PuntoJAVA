@@ -52,7 +52,7 @@ public class Ventas extends javax.swing.JFrame {
       private DefaultTableModel modeloTabla;
       
       private int paginaActual = 1;
-    private int registrosPorPagina = 50; // Cargar solo 50 registros a la vez
+    private int registrosPorPagina = 50; 
     private int totalPaginas = 0;
     
     // Variables para filtrado por fecha
@@ -99,11 +99,11 @@ public class Ventas extends javax.swing.JFrame {
      
      
      private void crearControlesPaginacion() {
-        // Panel de controles superior con filtro de fecha
+     
         panelControles = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         panelControles.setBackground(new java.awt.Color(255, 255, 255));
         
-        // ComboBox para filtrar por fecha
+       
        
      
         comboFiltroFecha = new javax.swing.JComboBox<>(new String[]{
@@ -122,10 +122,10 @@ public class Ventas extends javax.swing.JFrame {
      
         panelControles.add(comboFiltroFecha);
         
-        // Agregar panel de controles arriba de la tabla
+    
         jPanel1.add(panelControles, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 90, 710, 40));
         
-        // Panel de paginación
+    
         JPanel panelPaginacion = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         panelPaginacion.setBackground(new java.awt.Color(255, 255, 255));
         
@@ -135,7 +135,7 @@ public class Ventas extends javax.swing.JFrame {
         btnSiguiente = new JButton(">");
         btnUltima = new JButton(">>");
         
-        // Estilo de botones
+      
         estilizarBotonPaginacion(btnPrimera);
         estilizarBotonPaginacion(btnAnterior);
         estilizarBotonPaginacion(btnSiguiente);
@@ -143,7 +143,7 @@ public class Ventas extends javax.swing.JFrame {
         
         lblPaginaInfo.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 24));
         
-        // Eventos
+     
         btnPrimera.addActionListener(e -> irAPagina(1));
         btnAnterior.addActionListener(e -> irAPagina(paginaActual - 1));
         btnSiguiente.addActionListener(e -> irAPagina(paginaActual + 1));
@@ -271,18 +271,18 @@ public class Ventas extends javax.swing.JFrame {
         
         TablaHistorial.setModel(modeloTabla);
         
-        // Configurar renderizador y editor para el botón
+      
         TablaHistorial.getColumnModel().getColumn(4).setCellRenderer(
             new VerTicketRenderer());
         TablaHistorial.getColumnModel().getColumn(4).setCellEditor(
             new VerTicketEditor (new javax.swing.JCheckBox(), this));
         
-        // Ajustar anchos de columnas
-        TablaHistorial.getColumnModel().getColumn(0).setPreferredWidth(80);  // N° Venta
-        TablaHistorial.getColumnModel().getColumn(1).setPreferredWidth(150); // Fecha
-        TablaHistorial.getColumnModel().getColumn(2).setPreferredWidth(100); // Total
-        TablaHistorial.getColumnModel().getColumn(3).setPreferredWidth(120); // Cajero
-        TablaHistorial.getColumnModel().getColumn(4).setPreferredWidth(140); // Operaciones
+    
+        TablaHistorial.getColumnModel().getColumn(0).setPreferredWidth(80);  
+        TablaHistorial.getColumnModel().getColumn(1).setPreferredWidth(150); 
+        TablaHistorial.getColumnModel().getColumn(2).setPreferredWidth(100); 
+        TablaHistorial.getColumnModel().getColumn(3).setPreferredWidth(120); 
+        TablaHistorial.getColumnModel().getColumn(4).setPreferredWidth(140); 
         
         TablaHistorial.setRowHeight(35);
     }
@@ -293,7 +293,7 @@ public class Ventas extends javax.swing.JFrame {
     try {
         Conexion conexion = new Conexion();
         
-        // Calcular el offset según la página actual
+        
         int offset = (paginaActual - 1) * registrosPorPagina;
         String condicionFecha = obtenerCondicionFecha();
         
@@ -306,8 +306,8 @@ public class Ventas extends javax.swing.JFrame {
                     "LIMIT ? OFFSET ?";
         
         PreparedStatement ps = conexion.conectar().prepareStatement(sql);
-        ps.setInt(1, registrosPorPagina);  // 50 registros por página
-        ps.setInt(2, offset);               // Desde qué registro empezar
+        ps.setInt(1, registrosPorPagina);  
+        ps.setInt(2, offset);              
         
         ResultSet rs = ps.executeQuery();
         
@@ -333,7 +333,7 @@ public class Ventas extends javax.swing.JFrame {
         rs.close();
         ps.close();
         
-        // Actualizar los controles de paginación
+        
         actualizarControlesPaginacion();
         
     } catch (SQLException e) {
@@ -381,7 +381,7 @@ public class Ventas extends javax.swing.JFrame {
             productos.add(new itemVentas(
                 0,
                 rsDetalle.getString("nombreProducto"),
-                rsDetalle.getDouble("cantidad"), // ✅ getDouble
+                rsDetalle.getDouble("cantidad"), 
                 rsDetalle.getBigDecimal("precioUnitario"),
                 rsDetalle.getBigDecimal("subtotal")
             ));
@@ -405,7 +405,7 @@ public class Ventas extends javax.swing.JFrame {
                 item.getNombreProducto().substring(0, 12) + "..." : 
                 item.getNombreProducto();
             
-            // ✅ Formatear cantidad correctamente
+            
             String cantidadStr;
             if (item.getCantidad() == Math.floor(item.getCantidad())) {
                 cantidadStr = String.format("%.0f", item.getCantidad());

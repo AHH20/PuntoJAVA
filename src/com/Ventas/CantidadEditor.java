@@ -59,11 +59,11 @@ public class CantidadEditor extends AbstractCellEditor implements TableCellEdito
         this.table = table;
         this.filaActual = row;
         
-        // Obtener unidad de medida del producto
+        
         String nombreProducto = table.getValueAt(row, 0).toString();
         obtenerUnidadMedida(nombreProducto);
         
-        // Convertir valor a double
+     
         cantidad = value != null ? Double.parseDouble(value.toString()) : 0.0;
         actualizarLabel();
         
@@ -74,7 +74,7 @@ public class CantidadEditor extends AbstractCellEditor implements TableCellEdito
     try {
         Conexion conexion = new Conexion();
         
-        // ✅ PRIMERO: Buscar en Productos
+      
         String sql = "SELECT unidadMedida FROM Productos WHERE nombreProducto = ?";
         PreparedStatement ps = conexion.conectar().prepareStatement(sql);
         ps.setString(1, nombreProducto);

@@ -18,7 +18,6 @@ public class EliminarEditor extends AbstractCellEditor implements TableCellEdito
         this.button = new JButton("🗑️");
         this.button.setToolTipText("Eliminar");
         
-        // ⭐ AGREGAR EL ACTION LISTENER AL BOTÓN
         this.button.addActionListener(e -> eliminarFila());
     }
     
@@ -44,7 +43,7 @@ public class EliminarEditor extends AbstractCellEditor implements TableCellEdito
                 JTable table = ventanaVenta.TablaCompra;
                 DefaultTableModel modelo = (DefaultTableModel) table.getModel();
                 
-                // ⭐ VALIDAR QUE LA FILA EXISTE
+             
                 if (filaActual >= 0 && filaActual < modelo.getRowCount()) {
                     modelo.removeRow(filaActual);
                     ventanaVenta.calcularTotal();

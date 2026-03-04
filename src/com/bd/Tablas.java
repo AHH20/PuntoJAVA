@@ -11,7 +11,7 @@ public class Tablas {
         try(Connection db = Conexion.conectar()){
             Statement sms = db.createStatement();
             
-            // Tabla Usuarios
+           
             String sqlUsuarios = 
                     "CREATE TABLE IF NOT EXISTS Usuarios ("
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -22,7 +22,7 @@ public class Tablas {
             sms.execute(sqlUsuarios);
             System.out.println("Tabla usuarios creada");
             
-            // Tabla Categorías
+          
             String sqlCategorias = 
                    "CREATE TABLE IF NOT EXISTS Categorias("
                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -30,7 +30,7 @@ public class Tablas {
            sms.execute(sqlCategorias);
            System.out.println("Tabla Categoria Creada");
             
-            // Tabla Productos
+         
             String sqlProductos = 
                     "CREATE TABLE IF NOT EXISTS Productos("
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -45,7 +45,7 @@ public class Tablas {
            sms.execute(sqlProductos);
            System.out.println("Tabla Productos creada");
            
-           // Tabla Ventas
+       
            String sqlVentas = 
                    "CREATE TABLE IF NOT EXISTS Ventas("
                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -61,7 +61,7 @@ public class Tablas {
            sms.execute(sqlVentas);
            System.out.println("Tabla Ventas creada");
            
-           // Tabla Servicios
+         
            String sqlServicios = 
                 "CREATE TABLE IF NOT EXISTS Servicios("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -74,17 +74,17 @@ public class Tablas {
            sms.execute(sqlServicios);
            System.out.println("Tabla Servicios creada");
            
-           // Crear índice para mejorar rendimiento de consultas por fecha
+          
            String sqlIndiceVentasFecha = 
                    "CREATE INDEX IF NOT EXISTS idx_ventas_fecha " +
                    "ON Ventas(fechaVenta)";
            sms.execute(sqlIndiceVentasFecha);
            System.out.println("Índice de fecha en Ventas creado");
            
-           // ✅ VERIFICAR SI HAY QUE MODIFICAR DetalleVentas
+      
            verificarYModificarDetalleVentas(db, sms);
            
-           // Tabla MovimientosInventario
+      
            String sqlMovimientos = 
                    "CREATE TABLE IF NOT EXISTS MovimientosInventario("
                    + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -103,7 +103,7 @@ public class Tablas {
            sms.execute(sqlMovimientos);
            System.out.println("Tabla MovimientosInventario creada");
            
-           // Tabla VentasArchivadas
+           
            String sqlVentasArchivadas = 
                    "CREATE TABLE IF NOT EXISTS VentasArchivadas("
                    + "id INTEGER PRIMARY KEY,"
@@ -125,7 +125,7 @@ public class Tablas {
            sms.execute(sqlIndiceArchivadas);
            System.out.println("Índice en VentasArchivadas creado");
            
-           // Tabla DetalleVentasArchivadas
+         
            String sqlDetalleArchivadas = 
                    "CREATE TABLE IF NOT EXISTS DetalleVentasArchivadas("
                    + "id INTEGER PRIMARY KEY,"
@@ -145,7 +145,7 @@ public class Tablas {
            sms.execute(sqlIndiceDetalleArchivadas);
            System.out.println("Índice en DetalleVentasArchivadas creado");
            
-           // Insertar categorías por defecto
+          
            String contar = "SELECT COUNT(*) FROM Categorias";
            ResultSet rs = sms.executeQuery(contar);
            
@@ -169,7 +169,6 @@ public class Tablas {
                System.out.println("Categorias insertadas");
            }
            
-           // Optimizar base de datos
            sms.execute("ANALYZE");
            System.out.println("Base de datos optimizada");
         
@@ -179,10 +178,10 @@ public class Tablas {
         }
     }
     
-    // ✅ MÉTODO MEJORADO PARA VERIFICAR Y MODIFICAR DetalleVentas
+    
     private static void verificarYModificarDetalleVentas(Connection db, Statement sms) {
         try {
-            // Verificar si la tabla existe y su estructura
+            
             ResultSet rs = sms.executeQuery(
                 "SELECT sql FROM sqlite_master WHERE type='table' AND name='DetalleVentas'"
             );
@@ -192,23 +191,22 @@ public class Tablas {
             if (rs.next()) {
                 String sqlActual = rs.getString("sql");
                 
-                // Si idProducto es NOT NULL o no tiene los campos nuevos, modificar
+              
                 if (sqlActual.contains("idProducto INTEGER NOT NULL") || 
                     !sqlActual.contains("idServicio") ||
                     !sqlActual.contains("tipoItem") ||
-                    !sqlActual.contains("costoInsumo")) {  // ✅ VERIFICAR costoInsumo
+                    !sqlActual.contains("costoInsumo")) {  
                     necesitaModificacion = true;
                 }
             } else {
-                // La tabla no existe, crearla con la estructura correcta
+              
                 necesitaModificacion = true;
             }
             rs.close();
             
             if (necesitaModificacion) {
-                System.out.println("🔧 Creando/Modificando tabla DetalleVentas para soportar servicios y costos históricos...");
-                
-                // Verificar si existe tabla antigua para migrar datos
+              
+               
                 ResultSet rsCheck = sms.executeQuery(
                     "SELECT name FROM sqlite_master WHERE type='table' AND name='DetalleVentas'"
                 );
@@ -216,35 +214,35 @@ public class Tablas {
                 rsCheck.close();
                 
                 if (existeTablaAntigua) {
-                    // Renombrar tabla actual
+               
                     sms.execute("ALTER TABLE DetalleVentas RENAME TO DetalleVentas_OLD");
                     System.out.println("  → Tabla antigua respaldada como DetalleVentas_OLD");
                 }
                 
-                // ✅ CREAR NUEVA TABLA CON ESTRUCTURA COMPLETA
+              
                 String sqlDetalleVentas = 
                     "CREATE TABLE DetalleVentas("
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + "idVenta INTEGER NOT NULL,"
-                    + "idProducto INTEGER,"  // ✅ NULLABLE para soportar servicios
-                    + "idServicio INTEGER,"  // ✅ NUEVO campo para servicios
-                    + "tipoItem TEXT NOT NULL DEFAULT 'producto'," // ✅ 'producto' o 'servicio'
+                    + "idProducto INTEGER,"  
+                    + "idServicio INTEGER,"  
+                    + "tipoItem TEXT NOT NULL DEFAULT 'producto'," 
                     + "nombreProducto VARCHAR(100) NOT NULL,"
                     + "cantidad REAL NOT NULL,"
                     + "precioUnitario REAL NOT NULL,"
                     + "subtotal REAL NOT NULL,"
-                    + "costoInsumo REAL DEFAULT 0," // ✅ NUEVO: Costo histórico de insumos
-                    + "precioCompraHistorico REAL DEFAULT 0," // ✅ NUEVO: Precio compra del producto en ese momento
+                    + "costoInsumo REAL DEFAULT 0," 
+                    + "precioCompraHistorico REAL DEFAULT 0," 
                     + "FOREIGN KEY(idVenta) REFERENCES Ventas(id) ON DELETE CASCADE,"
                     + "FOREIGN KEY(idProducto) REFERENCES Productos(id),"
                     + "FOREIGN KEY(idServicio) REFERENCES Servicios(id))";
                 sms.execute(sqlDetalleVentas);
                 System.out.println("  ✓ Nueva estructura de DetalleVentas creada");
                 
-                // Migrar datos si había tabla antigua
+               
                 if (existeTablaAntigua) {
                     try {
-                        // Verificar columnas de la tabla antigua
+                 
                         ResultSet rsColumns = sms.executeQuery(
                             "PRAGMA table_info(DetalleVentas_OLD)"
                         );
@@ -259,16 +257,16 @@ public class Tablas {
                         }
                         rsColumns.close();
                         
-                        // Migrar según columnas disponibles
+                       
                         String sqlMigrar;
                         if (tieneIdServicio && tieneTipoItem) {
-                            // Tabla ya tenía servicios
+                           
                             sqlMigrar = 
                                 "INSERT INTO DetalleVentas (id, idVenta, idProducto, idServicio, tipoItem, nombreProducto, cantidad, precioUnitario, subtotal, costoInsumo, precioCompraHistorico) " +
                                 "SELECT id, idVenta, idProducto, idServicio, tipoItem, nombreProducto, cantidad, precioUnitario, subtotal, 0, 0 " +
                                 "FROM DetalleVentas_OLD";
                         } else {
-                            // Tabla antigua solo tenía productos
+                            
                             sqlMigrar = 
                                 "INSERT INTO DetalleVentas (id, idVenta, idProducto, tipoItem, nombreProducto, cantidad, precioUnitario, subtotal, costoInsumo, precioCompraHistorico) " +
                                 "SELECT id, idVenta, idProducto, 'producto', nombreProducto, cantidad, precioUnitario, subtotal, 0, 0 " +
@@ -276,16 +274,15 @@ public class Tablas {
                         }
                         
                         sms.execute(sqlMigrar);
-                        System.out.println("  ✓ Datos migrados correctamente (" + 
+                        System.out.println("(" + 
                             (tieneIdServicio ? "con servicios" : "solo productos") + ")");
                         
                         // Eliminar tabla antigua
                         sms.execute("DROP TABLE DetalleVentas_OLD");
-                        System.out.println("  ✓ Tabla antigua eliminada");
+                    
                         
                     } catch (Exception e) {
-                        System.out.println("  ⚠ Advertencia: No se pudieron migrar datos: " + e.getMessage());
-                        System.out.println("  → Puedes intentar migrar manualmente o eliminar DetalleVentas_OLD");
+                        
                     }
                 }
                 
@@ -300,15 +297,15 @@ public class Tablas {
                     "ON DetalleVentas(tipoItem)";
                 sms.execute(sqlIndiceTipoItem);
                 
-                System.out.println("  ✓ Índices creados");
-                System.out.println("✅ Tabla DetalleVentas actualizada exitosamente");
+                System.out.println("Índices creados");
+                System.out.println("Tabla DetalleVentas actualizada exitosamente");
                 
             } else {
-                System.out.println("✓ Tabla DetalleVentas ya tiene la estructura correcta");
+                System.out.println("Tabla DetalleVentas ya tiene la estructura correcta");
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Error al verificar/modificar DetalleVentas: " + e.getMessage());
+            System.err.println("Error al verificar/modificar DetalleVentas: " + e.getMessage());
             e.printStackTrace();
         }
     }
